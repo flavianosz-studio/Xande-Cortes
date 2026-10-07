@@ -683,8 +683,19 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
               <span style="font-size:12px;font-weight:800;padding:4px 8px;border-radius:7px;background:{{ o.stBg }};color:{{ o.stFg }};">{{ o.status }}</span>
               <div style="display:flex;gap:6px;">
                 <sc-if value="{{ o.isPending }}"><button onClick="{{ o.onConfirm }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;background:oklch(0.8 0.15 150);color:#0d1a10;border-radius:8px;padding:8px 10px;font-weight:800;font-size:12px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Confirmar pgto</button></sc-if>
+                <sc-if value="{{ o.isPaid }}"><button onClick="{{ o.onToggle }}" style="border:1px solid #3d4a58;background:transparent;color:#f2f5f7;border-radius:14px;padding:8px 10px;font-weight:700;font-size:12px;cursor:pointer;transition:transform .18s ease,border-color .18s ease;" style-hover="transform:translateY(-2px);border-color:oklch(0.72 0.17 240);">{{ o.toggleLabel }}</button></sc-if>
                 <button onClick="{{ o.onDelete }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:transparent;color:#9aa6b2;border-radius:8px;padding:8px 10px;font-weight:700;font-size:12px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Excluir</button>
               </div>
+              <sc-if value="{{ o.open }}">
+                <div style="flex:1 1 100%;display:flex;flex-direction:column;gap:6px;border-top:1px solid #34404d;padding-top:10px;">
+                  <span style="font-size:12px;font-weight:700;color:#9aa6b2;">{{ o.numsLabel }}</span>
+                  <div style="display:flex;flex-wrap:wrap;gap:5px;max-height:220px;overflow:auto;">
+                    <sc-for list="{{ o.chips }}" as="ch">
+                      <span style="font-variant-numeric:tabular-nums;font-size:12px;font-weight:700;padding:4px 7px;border-radius:6px;background:{{ ch.bg }};color:{{ ch.fg }};">{{ ch.n }}</span>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
             </div>
           </sc-for>
         </div>
@@ -837,6 +848,37 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   </div>
 </sc-if>
 
+<sc-if value="{{ upsellShow }}">
+  <div onClick="{{ upsellClose }}" style="position:fixed;inset:0;z-index:58;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:14px;">
+    <div onClick="{{ stop }}" style="width:100%;max-width:420px;background:#26303b;border:1px solid #34404d;border-radius:22px;padding:22px 18px 18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 24px 60px rgba(0,0,0,.5);">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:12px;font-weight:800;color:#0d1a10;background:oklch(0.8 0.15 150);border-radius:999px;padding:5px 10px;">Pagamento confirmado ✓</span>
+        <button onClick="{{ upsellClose }}" aria-label="Fechar" style="border:none;background:transparent;color:#9aa6b2;font-size:18px;cursor:pointer;">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <span style="font-size:26px;font-weight:800;line-height:1.1;letter-spacing:-0.02em;">Aumente suas chances!</span>
+        <span style="font-size:14px;color:#c9d1d9;line-height:1.5;">Leve mais cotas agora e concorra com mais números. Quanto mais cotas, menor o valor de cada uma.</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <sc-for list="{{ upsellOpts }}" as="u" hint-placeholder-count="3">
+          <button onClick="{{ u.onClick }}" style="position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;background:#1e2630;border:2px solid {{ u.border }};border-radius:16px;padding:14px 16px;color:#f2f5f7;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;" style-hover="transform:translateY(-2px);border-color:oklch(0.72 0.17 240);box-shadow:0 10px 24px rgba(0,0,0,.35);" style-active="transform:scale(.98);">
+            <div style="display:flex;flex-direction:column;gap:2px;">
+              <span style="font-size:18px;font-weight:800;">{{ u.qty }}</span>
+              <span style="font-size:12px;color:#9aa6b2;">{{ u.sub }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <span style="font-size:17px;font-weight:800;color:oklch(0.72 0.17 240);font-variant-numeric:tabular-nums;">{{ u.price }}</span>
+              <sc-if value="{{ u.hasOff }}"><span style="font-size:11px;font-weight:800;background:oklch(0.8 0.15 150);color:#0d1a10;border-radius:6px;padding:2px 6px;">{{ u.off }}</span></sc-if>
+            </div>
+            <sc-if value="{{ u.hot }}"><span style="position:absolute;top:-10px;left:14px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));color:#fff;border-radius:999px;padding:3px 8px;">Mais escolhido</span></sc-if>
+          </button>
+        </sc-for>
+      </div>
+      <button onClick="{{ upsellClose }}" style="border:none;background:transparent;color:#9aa6b2;font-size:14px;font-weight:600;padding:6px;cursor:pointer;text-decoration:underline;">Agora não, obrigado</button>
+    </div>
+  </div>
+</sc-if>
+
 <sc-if value="{{ hasToast }}">
   <div style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60;background:#f2f5f7;color:#1e2630;font-weight:800;font-size:14px;padding:12px 18px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.4);">{{ toast }}</div>
 </sc-if>
@@ -886,7 +928,7 @@ class Component extends DCLogic {
     wInput: '', wPhone: '', wDeg: 0, spinning: false, wResult: null, spinsLeft: 0, myWins: [],
     adm: false, email: '', pass: '', passErr: '', authBusy: false, tab: 'geral', aLoading: false,
     cEdit: null, dirty: false, saving: false, aOrders: [], aSpins: [], lastSync: 0,
-    newPN: { number: '', prize: '' }, orderF: 'todos', orderQ: '', lookup: '', lookupRes: null,
+    upsell: false, openNums: {}, newPN: { number: '', prize: '' }, orderF: 'todos', orderQ: '', lookup: '', lookupRes: null,
     fedForm: { concurso: '', date: '', p1: '', p2: '' }, toast: '',
     menu: false, dMode: null, installHelp: false, appHidden: localStorage.getItem('xc_app') === '0',
     cookie: localStorage.getItem('xc_cookie') === '1', age: localStorage.getItem('xc_18') || ''
@@ -912,7 +954,9 @@ class Component extends DCLogic {
       if (!this.sb || document.hidden) return;
       if (this.state.page === 'admin') { if (this.state.adm && this.state.campRow) this.loadOrders(); }
       else this.loadPublicStats();
-    }, 20000);
+    }, 10000);
+    this._vis = () => { if (!document.hidden && this.sb) { if (this.state.page === 'admin') { if (this.state.adm && this.state.campRow) this.loadOrders(); } else this.loadPublicStats(); } };
+    document.addEventListener('visibilitychange', this._vis);
   }
   componentWillUnmount() { [this._tick, this._poll, this._payT].forEach(clearInterval); clearTimeout(this._bootT); window.removeEventListener('hashchange', this._route); window.removeEventListener('beforeinstallprompt', this._bip); }
   toast(msg) { clearTimeout(this._toastT); this.setState({ toast: msg }); this._toastT = setTimeout(() => this.setState({ toast: '' }), 3000); }
@@ -939,13 +983,13 @@ class Component extends DCLogic {
   async loadPrizes(id) { const { data } = await this.sb.from('prize_numbers').select('*').eq('campaign_id', id).order('number'); this.setState({ prizeNumbers: data || [] }); }
   async loadResult(id) { const { data } = await this.sb.from('results').select('*').eq('campaign_id', id).maybeSingle(); this.setState({ result: data || null }); }
 
-  async genPix() {
-    const s = this.state, f = s.form, ph = Component.digits(f.phone);
+  async genPix(qOverride) {
+    const s = this.state, f = s.form, ph = Component.digits(f.phone), q = qOverride || s.qty;
     if (f.name.trim().split(/\s+/).length < 2) return this.setState({ coErr: 'Informe nome e sobrenome' });
     if (ph.length < 10) return this.setState({ coErr: 'WhatsApp inválido' });
     if (!f.terms) return this.setState({ coErr: 'Aceite o regulamento para continuar' });
     this.setState({ coBusy: true, coErr: '' });
-    const { data, error } = await this.sb.rpc('create_order', { p_campaign: s.campRow.id, p_name: f.name.trim(), p_phone: ph, p_qty: s.qty });
+    const { data, error } = await this.sb.rpc('create_order', { p_campaign: s.campRow.id, p_name: f.name.trim(), p_phone: ph, p_qty: q });
     this.setState({ coBusy: false });
     if (error) return this.setState({ coErr: error.message });
     this.openPix(Array.isArray(data) ? data[0] : data);
@@ -967,6 +1011,7 @@ class Component extends DCLogic {
     if (!silent) { if (this._checking) return; this._checking = true; this.setState({ checking: true }); }
     let mp = null;
     try { const r = await this.sb.functions.invoke('mp-pix', { body: { order_id: id, check: true } }); mp = r.data; } catch (e) {}
+    if (mp && mp.confirm_error && !silent) this.toast('Pagamento aprovado, erro ao gerar números: ' + mp.confirm_error);
     const { data, error } = await this.sb.rpc('order_status', { p_order: id });
     if (!silent) { this._checking = false; this.setState({ checking: false }); }
     if (error) { if (!silent) this.toast('Erro ao verificar: ' + error.message); return; }
@@ -974,6 +1019,7 @@ class Component extends DCLogic {
       clearInterval(this._payT);
       this.setState(s => ({ co: s.co ? { step: 'done', order: { ...s.co.order, status: 'paid' }, numbers: data.numbers || [] } : s.co }));
       this.loadPublicStats();
+      clearTimeout(this._upT); this._upT = setTimeout(() => { if (this.state.co && this.state.co.step === 'done') this.setState({ upsell: true }); }, 1800);
     } else if (!silent) {
       this.toast(mp && mp.status === 'approved' ? 'Pagamento aprovado! Gerando seus números…' : 'O PIX ainda não caiu. Assim que cair, esta tela atualiza sozinha.');
     }
@@ -1111,6 +1157,13 @@ class Component extends DCLogic {
   }
   async rmPN(p) { if (!confirm('Remover esta cota premiada?')) return; const { error } = await this.sb.from('prize_numbers').delete().eq('id', p.id); if (error) return this.err(error); this.loadPrizesAdm(this.state.campRow.id); }
   async confirmOrder(o) { const { error } = await this.sb.rpc('confirm_order', { p_order: o.id }); if (error) return this.err(error); this.toast('Pagamento confirmado e números gerados'); this.loadOrders(); this.loadPrizesAdm(this.state.campRow.id); }
+  async toggleNums(id) {
+    if (this.state.openNums[id]) return this.setState(s => { const m = { ...s.openNums }; delete m[id]; return { openNums: m }; });
+    this.setState(s => ({ openNums: { ...s.openNums, [id]: true } }));
+    const { data, error } = await this.sb.from('order_numbers').select('number').eq('order_id', id).order('number').range(0, 9999);
+    if (error) return this.err(error);
+    this.setState(s => s.openNums[id] ? { openNums: { ...s.openNums, [id]: (data || []).map(x => x.number) } } : null);
+  }
   async deleteOrder(o) { if (!confirm(`Excluir o pedido ${o.id}? Os números dele voltam a ficar livres.`)) return; const { error } = await this.sb.from('orders').delete().eq('id', o.id); if (error) return this.err(error); this.loadOrders(); }
   async apurar() {
     const s = this.state, C = Component, f = s.fedForm, total = Math.max(1, C.int(s.cEdit.total)), digits = String(total - 1).length;
@@ -1159,7 +1212,7 @@ class Component extends DCLogic {
     const spinsOn = every > 0 && wheel.length >= 2;
     const sold = s.sold, rowTotal = row ? row.total : total, pct = Math.min(100, sold / Math.max(1, rowTotal) * 100);
     const ended = hasCamp && (row.status !== 'active' || sold >= row.total);
-    const pctLabel = pct.toFixed(pct < 10 ? 1 : 0).replace('.', ',') + '%';
+    const pctLabel = (sold > 0 && pct < 0.01) ? '<0,01%' : pct.toFixed(pct < 1 ? 2 : pct < 10 ? 1 : 0).replace('.', ',') + '%';
     const prizeSet = new Map(s.prizeNumbers.map(p => [p.number, p.prize]));
     const outMap = new Map(s.prizesOut.map(x => [x.number, x.name]));
     const chipsFor = nums => (nums || []).slice(0, 3000).map(n => prizeSet.has(n) ? { n: pad(n), bg: 'oklch(0.8 0.15 150)', fg: '#0d1a10' } : { n: pad(n), bg: '#2e3946', fg: '#f2f5f7' });
@@ -1219,7 +1272,11 @@ class Component extends DCLogic {
       .filter(o => !q || o.name.toLowerCase().includes(q) || (C.digits(q) && o.phone.includes(C.digits(q))) || o.id.toLowerCase().includes(q))
       .slice(0, 300).map(o => ({
         id: o.id, name: o.name, phone: C.fmtPhone(o.phone), date: C.date(o.createdAt), qty: o.qty, total: C.brl(o.total), ...st(o), isPending: o.status === 'pending',
-        onConfirm: () => this.confirmOrder(o), onDelete: () => this.deleteOrder(o)
+        onConfirm: () => this.confirmOrder(o), onDelete: () => this.deleteOrder(o),
+        isPaid: o.status === 'paid', open: !!s.openNums[o.id], toggleLabel: s.openNums[o.id] ? 'Ocultar cotas' : 'Ver cotas',
+        numsLabel: Array.isArray(s.openNums[o.id]) ? `${s.openNums[o.id].length} cotas · premiadas em verde` : 'Carregando…',
+        chips: Array.isArray(s.openNums[o.id]) ? chipsFor(s.openNums[o.id]) : [],
+        onToggle: () => this.toggleNums(o.id)
       }));
     const resOwner = res ? aOrders.find(o => o.id === res.order_id) : null;
     const lk = s.lookupRes;
@@ -1306,6 +1363,23 @@ class Component extends DCLogic {
       setFPhone: e => this.setState({ form: { ...s.form, phone: C.fmtPhone(e.target.value) } }),
       setFTerms: e => this.setState({ form: { ...s.form, terms: e.target.checked } }),
       coTotal: coOrder ? C.brl(coOrder.total) : '', coOrderId: coOrder ? coOrder.id : '', pixTimer, pixCode, qrSrc: qrSrc || '', hasQr: !!qrSrc, noQr: !qrSrc,
+      upsellShow: !!s.upsell && coStep === 'done',
+      upsellClose: () => this.setState({ upsell: false }),
+      upsellOpts: (() => {
+        let qs = (c.combos || []).map(x => C.int(x.qty)).filter(v => v >= minQty && C.num((c.combos.find(y => C.int(y.qty) === v) || {}).price) > 0);
+        if (!qs.length) qs = String(c.quickRaw || '').split(',').map(x => C.int(x)).filter(v => v >= minQty);
+        if (!qs.length) qs = [minQty * 5, minQty * 10, minQty * 25];
+        qs = [...new Set(qs)].sort((a, b) => a - b).slice(-3);
+        const left = row ? row.total - sold : 0;
+        return qs.filter(v => v <= left).map((v, i, arr) => { const pr = C.priceFor(v, c), off = Math.round((1 - pr / (v * price || 1)) * 100); return {
+          qty: `+${v.toLocaleString('pt-BR')} cotas`, price: C.brl(pr), hasOff: off > 0, off: `-${off}%`, hot: i === Math.min(1, arr.length - 1),
+          border: i === Math.min(1, arr.length - 1) ? 'oklch(0.72 0.17 240)' : '#3d4a58', sub: spinsOn && Math.floor(v / every) > 0 ? `+${Math.floor(v / every)} giro(s) na roleta` : `${C.brl(pr / v)} por cota`,
+          onClick: () => {
+            const f = s.form, ok = f.name.trim().split(/\s+/).length >= 2 && C.digits(f.phone).length >= 10 && f.terms;
+            clearInterval(this._payT); this.setState({ upsell: false, qty: v, qtyTouched: true });
+            if (ok) { this.setState({ co: { step: 'form' } }); this.genPix(v); } else this.setState({ co: { step: 'form' }, coErr: '' });
+          } }; });
+      })(),
       paidBtnLabel: s.checking ? 'Verificando pagamento…' : 'Já paguei',
       pixOk: !s.pix.err, pixFail: !!s.pix.err, pixErrMsg: s.pix.msg || '',
       pixStatus: s.pix.loading ? 'Gerando seu PIX…' : s.pix.err ? 'PIX automático indisponível. Fale com o suporte.' : 'Aguardando pagamento…',
@@ -1322,7 +1396,7 @@ class Component extends DCLogic {
       aLoading: s.adm && s.aLoading && !hasCamp, noCampAdm: s.adm && !s.aLoading && !hasCamp, createCampaign: () => this.createCampaign(), statusLabel,
       tabs: campOK ? [['geral', 'Dashboard'], ['campanha', 'Campanha'], ['cotas', 'Cotas premiadas'], ['roleta', 'Roleta'], ['pedidos', 'Pedidos'], ['sorteio', 'Sorteio']].map(([k, label]) => ({ label, bg: s.tab === k ? '#f2f5f7' : 'transparent', fg: s.tab === k ? '#1e2630' : '#f2f5f7', onClick: () => this.setState({ tab: k }) })) : [],
       tGeral: campOK && s.tab === 'geral', tCampanha: campOK && s.tab === 'campanha', tCotas: campOK && s.tab === 'cotas', tRoleta: campOK && s.tab === 'roleta', tPedidos: campOK && s.tab === 'pedidos', tSorteio: campOK && s.tab === 'sorteio',
-      refresh: () => this.loadAdmin(), lastSyncLabel: s.lastSync ? `Atualizado ${C.ago(s.lastSync, now)} · atualiza sozinho a cada 20s` : '',
+      refresh: () => this.loadAdmin(), lastSyncLabel: s.lastSync ? `Atualizado ${C.ago(s.lastSync, now)} · atualiza sozinho a cada 10s` : '',
       stats: [
         { label: 'Faturamento', value: C.brl(revenue), sub: `Hoje ${C.brl(revToday)} · 7 dias ${C.brl(rev7)}`, color: 'oklch(0.8 0.15 150)' },
         { label: 'Cotas vendidas', value: sold.toLocaleString('pt-BR'), sub: `${pctLabel} do total`, color: '#f2f5f7' },
