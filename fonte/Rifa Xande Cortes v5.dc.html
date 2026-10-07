@@ -14,6 +14,9 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin="anonymous">
+<link rel="preconnect" href="https://witcarbhfyitbgxrwfrz.supabase.co" crossorigin="anonymous">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -42,7 +45,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         <span style="width:14px;height:2px;background:#f2f5f7;border-radius:2px;"></span>
         <span style="width:9px;height:2px;background:oklch(0.72 0.17 240);border-radius:2px;"></span>
       </button>
-      <img onClick="{{ goHome }}" src="logo-xande-cortes.png" alt="Xande Cortes" style="justify-self:center;height:54px;width:auto;display:block;cursor:pointer;transition:transform .2s ease;" style-hover="transform:scale(1.04) rotate(-1deg);">
+      <img onClick="{{ goHome }}" src="logo-xc.png" alt="Xande Cortes" style="justify-self:center;height:54px;width:auto;display:block;cursor:pointer;transition:transform .2s ease;" style-hover="transform:scale(1.04) rotate(-1deg);">
       <a href="https://wa.me/558197399489" target="_blank" style="font-size:13px;font-weight:700;color:oklch(0.72 0.17 240);text-decoration:none;">Suporte</a>
     </div>
   </header>
@@ -52,7 +55,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     <aside style="position:absolute;top:0;bottom:0;left:0;width:100%;background:#000;transform:translateX({{ menuX }});transition:transform .32s cubic-bezier(.2,.8,.2,1);overflow:auto;display:flex;flex-direction:column;">
       <div style="display:grid;grid-template-columns:48px 1fr 48px;align-items:center;padding:14px 16px;border-bottom:1px solid #1c1c1c;">
         <span></span>
-        <img src="logo-xande-cortes.png" alt="Xande Cortes" style="justify-self:center;height:50px;width:auto;display:block;">
+        <img src="logo-xc.png" alt="Xande Cortes" style="justify-self:center;height:50px;width:auto;display:block;">
         <button onClick="{{ closeMenu }}" aria-label="Fechar" style="width:48px;height:48px;border-radius:50%;border:1px solid #3a3a3a;background:#111;color:#f2f5f7;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .25s ease,border-color .18s ease;" style-hover="transform:rotate(90deg);border-color:#666;" style-active="transform:scale(.92);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f2f5f7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
       </div>
       <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
@@ -100,7 +103,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       <div style="margin:-16px -16px 0;display:flex;flex-direction:column;">
       <div style="position:relative;aspect-ratio:1/1;max-height:560px;overflow:hidden;background:repeating-linear-gradient(135deg,#26303b 0 12px,#2a3440 12px 24px);">
         <sc-if value="{{ hasImg }}">
-          <img src="{{ img }}" alt="Prêmio" style="width:100%;height:100%;object-fit:cover;display:block;">
+          <img src="{{ img }}" alt="Prêmio" fetchpriority="high" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block;">
         </sc-if>
         <sc-if value="{{ noImg }}" hint-placeholder-val="{{ true }}">
           <div style="position:absolute;top:0;left:0;right:0;height:55%;display:flex;align-items:center;justify-content:center;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:12px;color:#9aa6b2;text-align:center;padding:20px;">foto do prêmio — adicione no painel admin</div>
@@ -231,6 +234,22 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
             <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:26px;font-weight:700;">{{ totalLabel }}</span>
           </div>
         </div>
+        <sc-if value="{{ hasTiers }}">
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <span style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#9aa6b2;">Quanto mais cotas, menor o preço</span>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:6px;">
+              <sc-for list="{{ tierLadder }}" as="t">
+                <button onClick="{{ t.onClick }}" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 6px;border-radius:12px;border:1px solid {{ t.border }};background:{{ t.bg }};color:{{ t.fg }};cursor:pointer;font-family:inherit;transition:transform .18s ease,border-color .18s ease;" style-hover="transform:translateY(-2px);border-color:oklch(0.72 0.17 240);">
+                  <span style="font-size:11px;font-weight:700;">{{ t.label }}</span>
+                  <span style="font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;">{{ t.price }}</span>
+                </button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ hasNextTier }}">
+              <button onClick="{{ goNextTier }}" style="border:1px dashed oklch(0.72 0.17 240);background:oklch(0.62 0.19 248 / .12);color:#f2f5f7;border-radius:12px;padding:10px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-align:center;" style-hover="background:oklch(0.62 0.19 248 / .22);">{{ nextTierLabel }}</button>
+            </sc-if>
+          </div>
+        </sc-if>
         <button onClick="{{ openCheckout }}" disabled="{{ ended }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;width:100%;border:none;border-radius:14px;padding:18px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-size:17px;font-weight:700;letter-spacing:.02em;cursor:pointer;" style-active="transform:scale(.98);" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);">{{ buyLabel }}</button>
         <span style="text-align:center;font-size:12px;color:#9aa6b2;">Pagamento via PIX · números aleatórios gerados após a confirmação</span>
       </section>
@@ -400,7 +419,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       <sc-if value="{{ appShow }}">
         <div style="position:relative;width:100%;background:#2b4a6b;border:1px solid #3a5d82;border-radius:18px;padding:16px 46px 16px 18px;display:flex;align-items:center;gap:14px;text-align:left;transition:transform .18s ease,box-shadow .18s ease;" style-hover="transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.35);">
           <button onClick="{{ appDismiss }}" aria-label="Fechar" style="position:absolute;top:6px;right:8px;width:28px;height:28px;border:none;background:transparent;color:#c9d1d9;font-size:14px;cursor:pointer;">✕</button>
-          <div style="width:64px;height:64px;flex:none;border-radius:16px;background:#0f1419;display:flex;align-items:center;justify-content:center;padding:6px;"><img src="logo-xande-cortes.png" alt="Xande Cortes" style="width:100%;height:auto;display:block;"></div>
+          <div style="width:64px;height:64px;flex:none;border-radius:16px;background:#0f1419;display:flex;align-items:center;justify-content:center;padding:6px;"><img src="logo-xc.png" alt="Xande Cortes" style="width:100%;height:auto;display:block;"></div>
           <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;">
             <span style="font-size:17px;font-weight:700;color:#f2f5f7;">Instale nosso app grátis</span>
             <span style="font-size:13px;color:#c9d1d9;">Receba promoções exclusivas!</span>
@@ -430,7 +449,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 <div style="min-height:100vh;background:#192029;">
   <header style="border-bottom:1px solid #34404d;background:#1e2630;">
     <div style="max-width:1100px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-      <div style="display:flex;align-items:baseline;gap:6px;font-weight:800;font-size:20px;text-transform:uppercase;"><img src="logo-xande-cortes.png" alt="Xande Cortes" style="height:40px;width:auto;display:block;align-self:center;"><span style="font-size:12px;color:#9aa6b2;font-weight:700;margin-left:6px;">Painel admin</span></div>
+      <div style="display:flex;align-items:baseline;gap:6px;font-weight:800;font-size:20px;text-transform:uppercase;"><img src="logo-xc.png" alt="Xande Cortes" style="height:40px;width:auto;display:block;align-self:center;"><span style="font-size:12px;color:#9aa6b2;font-weight:700;margin-left:6px;">Painel admin</span></div>
       <div style="display:flex;gap:8px;">
         <button onClick="{{ goHome }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:transparent;color:#f2f5f7;border-radius:14px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Ver site</button>
         <sc-if value="{{ adm }}"><button onClick="{{ logout }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:transparent;color:#9aa6b2;border-radius:14px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Sair</button></sc-if>
@@ -458,6 +477,34 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
           <span style="font-size:22px;font-weight:700;">Nenhuma rifa criada ainda</span>
           <span style="font-size:14px;color:#9aa6b2;line-height:1.5;">Crie sua primeira rifa e depois configure título, fotos, valor de cada cota, total de cotas, combos, cotas premiadas e roleta.</span>
           <button onClick="{{ createCampaign }}" style="border:none;border-radius:14px;padding:14px 20px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;transition:transform .18s ease,filter .18s ease;" style-hover="transform:translateY(-2px);filter:brightness(1.08);">Criar primeira rifa</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ hasCampList }}">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#9aa6b2;">Minhas rifas</span>
+            <button onClick="{{ createCampaign }}" style="border:none;border-radius:12px;padding:10px 16px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));color:#ffffff;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;transition:transform .18s ease,filter .18s ease;" style-hover="transform:translateY(-2px);filter:brightness(1.08);" style-active="transform:scale(.96);">+ Nova rifa</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:10px;">
+            <sc-for list="{{ campList }}" as="k" hint-placeholder-count="2">
+              <div style="background:{{ k.bg }};border:2px solid {{ k.border }};border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                  <span style="font-size:16px;font-weight:800;line-height:1.25;min-width:0;overflow-wrap:anywhere;">{{ k.title }}</span>
+                  <span style="flex:none;font-size:11px;font-weight:800;padding:4px 8px;border-radius:999px;background:{{ k.stBg }};color:{{ k.stFg }};">{{ k.st }}</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:5px;">
+                  <div style="display:flex;justify-content:space-between;gap:8px;font-size:12px;color:#9aa6b2;"><span>{{ k.sold }}</span><span style="font-weight:700;color:#f2f5f7;">{{ k.pct }}</span></div>
+                  <div style="height:6px;background:#1e2630;border-radius:999px;overflow:hidden;"><div style="height:100%;width:{{ k.pctW }}%;background:oklch(0.72 0.17 240);"></div></div>
+                </div>
+                <span style="font-size:12px;color:oklch(0.78 0.13 240);font-weight:600;overflow-wrap:anywhere;">{{ k.link }}</span>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  <button onClick="{{ k.onPick }}" style="border:1px solid #3d4a58;background:transparent;color:#f2f5f7;border-radius:12px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:transform .18s ease,border-color .18s ease;flex:1 1 auto;" style-hover="transform:translateY(-2px);border-color:oklch(0.72 0.17 240);">{{ k.editLabel }}</button>
+                  <button onClick="{{ k.onCopy }}" style="border:1px solid #3d4a58;background:transparent;color:#f2f5f7;border-radius:12px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:transform .18s ease,border-color .18s ease;" style-hover="transform:translateY(-2px);border-color:oklch(0.72 0.17 240);">Copiar link</button>
+                  <button onClick="{{ k.onOpen }}" style="border:1px solid #3d4a58;background:transparent;color:#f2f5f7;border-radius:12px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:transform .18s ease,border-color .18s ease;" style-hover="transform:translateY(-2px);border-color:oklch(0.72 0.17 240);">Abrir</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
         </div>
       </sc-if>
       <nav style="display:flex;gap:6px;flex-wrap:wrap;">
@@ -542,6 +589,17 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:16px;align-items:start;">
           <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;">
             <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Dados da campanha</span>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Link personalizado
+              <div style="display:flex;align-items:stretch;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;overflow:hidden;">
+                <span style="display:flex;align-items:center;padding:0 0 0 12px;color:#7a8692;font-size:14px;font-weight:600;white-space:nowrap;">xandecortes.com.br/</span>
+                <input value="{{ slugVal }}" onChange="{{ setSlug }}" placeholder="audi-tt" style="flex:1;min-width:0;background:transparent;border:none;padding:11px 12px 11px 2px;color:#f2f5f7;font-size:14px;outline:none;font-family:inherit;">
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button onClick="{{ slugFromTitle }}" style="border:1px solid #3d4a58;background:transparent;color:#f2f5f7;border-radius:12px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:transform .18s ease,border-color .18s ease;" style-hover="transform:translateY(-2px);border-color:oklch(0.72 0.17 240);">Gerar pelo título</button>
+                <button onClick="{{ copySlug }}" style="border:1px solid #3d4a58;background:transparent;color:#f2f5f7;border-radius:12px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:transform .18s ease,border-color .18s ease;" style-hover="transform:translateY(-2px);border-color:oklch(0.72 0.17 240);">Copiar link</button>
+              </div>
+              <span style="font-weight:500;color:#7a8692;">Só letras minúsculas, números e hífen. Clique em Salvar para ativar.</span>
+            </div>
             <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Título<input value="{{ c.title }}" onChange="{{ f.title }}" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
             <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Descrição<textarea value="{{ c.desc }}" onChange="{{ f.desc }}" rows="3" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;resize:vertical;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></textarea></label>
             <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;">
@@ -564,7 +622,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
               <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;">
                 <sc-for list="{{ adminImgs }}" as="im">
                   <div style="position:relative;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:#1e2630;border:1px solid {{ im.border }};">
-                    <img src="{{ im.src }}" alt="Foto" style="width:100%;height:100%;object-fit:cover;display:block;">
+                    <img src="{{ im.src }}" alt="Foto" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block;">
                     <sc-if value="{{ im.isCover }}"><span style="position:absolute;left:6px;top:6px;background:oklch(0.72 0.17 240);color:#fff;font-size:10px;font-weight:800;border-radius:6px;padding:2px 6px;">Capa</span></sc-if>
                     <div style="position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;padding:6px;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.6));">
                       <button onClick="{{ im.onLeft }}" aria-label="Mover para a esquerda" style="width:28px;height:28px;border:none;border-radius:8px;background:rgba(15,20,25,.8);color:#fff;font-size:14px;cursor:pointer;">‹</button>
@@ -594,6 +652,21 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
               </sc-for>
               <button onClick="{{ addCombo }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px dashed #3d4a58;background:transparent;color:#f2f5f7;border-radius:14px;padding:10px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">+ Adicionar combo</button>
               <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Botões rápidos (separados por vírgula)<input value="{{ c.quickRaw }}" onChange="{{ f.quickRaw }}" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+            </div>
+            <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Desconto progressivo</span>
+              <span style="font-size:12px;color:#7a8692;line-height:1.5;">O valor de cada cota cai conforme a quantidade. Ex.: a partir de 100 cotas, R$ 0,80 cada. Abaixo da primeira faixa vale o valor normal da cota.</span>
+              <sc-for list="{{ tierRows }}" as="r">
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                  <span style="color:#9aa6b2;font-size:13px;">A partir de</span>
+                  <input value="{{ r.from }}" onChange="{{ r.onFrom }}" placeholder="Qtd" inputMode="numeric" style="flex:1;min-width:70px;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:10px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);">
+                  <span style="color:#9aa6b2;font-size:13px;">cotas, R$</span>
+                  <input value="{{ r.price }}" onChange="{{ r.onPrice }}" placeholder="0,80" inputMode="decimal" style="flex:1;min-width:70px;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:10px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);">
+                  <span style="color:#9aa6b2;font-size:13px;">cada</span>
+                  <button onClick="{{ r.onRemove }}" aria-label="Remover" style="border:1px solid #3d4a58;background:transparent;color:#9aa6b2;border-radius:14px;width:40px;height:40px;flex:none;cursor:pointer;" style-hover="border-color:oklch(0.72 0.17 240);">✕</button>
+                </div>
+              </sc-for>
+              <button onClick="{{ addTier }}" style="border:1px dashed #3d4a58;background:transparent;color:#f2f5f7;border-radius:14px;padding:10px;font-weight:700;cursor:pointer;transition:transform .18s ease,border-color .18s ease;" style-hover="transform:translateY(-2px);border-color:oklch(0.72 0.17 240);">+ Adicionar faixa de preço</button>
             </div>
             <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;">
               <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Ranking ao vivo</span>
@@ -817,6 +890,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       </sc-if>
 
       <sc-if value="{{ coDone }}">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:6px 0 4px;">
+          <div style="width:64px;height:64px;border-radius:50%;background:oklch(0.8 0.15 150);color:#0d1a10;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;">✓</div>
+          <span style="font-size:24px;font-weight:800;letter-spacing:-0.02em;">{{ doneThanks }}</span>
+          <span style="font-size:14px;color:#c9d1d9;line-height:1.5;max-width:340px;text-wrap:pretty;">Seu pagamento foi confirmado e seus números já estão garantidos. Boa sorte no sorteio! Acompanhe tudo em Meus títulos.</span>
+        </div>
         <sc-for list="{{ doneHits }}" as="h">
           <div style="background:oklch(0.8 0.15 150);color:#0d1a10;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;">
             <span style="font-size:12px;font-weight:800;text-transform:uppercase;">Cota premiada · {{ h.number }}</span>
@@ -832,6 +910,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         <sc-if value="{{ doneHasSpins }}">
           <button onClick="{{ goSpinFromDone }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;border-radius:14px;padding:16px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-size:16px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">Girar a roleta ({{ doneSpins }} giro/s)</button>
         </sc-if>
+        <button onClick="{{ upsellOpen }}" style="border:none;border-radius:14px;padding:16px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));color:#ffffff;font-size:15px;font-weight:800;cursor:pointer;transition:transform .18s ease,filter .18s ease;" style-hover="transform:translateY(-2px);filter:brightness(1.08);" style-active="transform:scale(.97);">Quero aumentar minhas chances</button>
         <button onClick="{{ closeCheckout }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;border-radius:14px;padding:14px;background:transparent;color:#f2f5f7;font-weight:800;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Fechar</button>
       </sc-if>
     </div>
@@ -896,13 +975,13 @@ class Component extends DCLogic {
   static date(ts) { return ts ? new Date(ts).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''; }
   static shortName(n) { const p = String(n || '').trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length - 1][0]}.` : p[0] || '—'; }
   static dec(v) { return String(v ?? '').replace('.', ','); }
-  static emptyC() { return { title: '', desc: '', price: '0', total: '0', minQty: '1', spinsEvery: '0', drawInfo: 'Resultado pela Loteria Federal', imagesRaw: '', combos: [], quickRaw: '', rankingOn: false, rankingMode: 'menor', rankingText: '', wheel: [] }; }
+  static emptyC() { return { slug: '', title: '', desc: '', price: '0', total: '0', minQty: '1', spinsEvery: '0', drawInfo: 'Resultado pela Loteria Federal', imagesRaw: '', combos: [], tiers: [], quickRaw: '', rankingOn: false, rankingMode: 'menor', rankingText: '', wheel: [] }; }
   static toC(r) {
     const C = Component;
     return {
-      title: r.title || '', desc: r.description || '', price: C.dec(r.price), total: String(r.total), minQty: String(r.min_qty), spinsEvery: String(r.spins_every ?? 0),
+      slug: r.slug || '', title: r.title || '', desc: r.description || '', price: C.dec(r.price), total: String(r.total), minQty: String(r.min_qty), spinsEvery: String(r.spins_every ?? 0),
       drawInfo: r.draw_info || '', imagesRaw: (r.images || []).join('\n'),
-      combos: (r.combos || []).map(x => ({ qty: String(x.qty), price: C.dec(x.price) })), quickRaw: (r.quick || []).join(', '),
+      combos: (r.combos || []).map(x => ({ qty: String(x.qty), price: C.dec(x.price) })), tiers: (r.tiers || []).map(x => ({ from: String(x.from), price: C.dec(x.price) })), quickRaw: (r.quick || []).join(', '),
       rankingOn: !!r.ranking_on, rankingMode: r.ranking_mode || 'menor', rankingText: r.ranking_text || '',
       wheel: (r.wheel || []).map(w => ({ label: w.label, weight: String(w.weight), loss: !!w.loss }))
     };
@@ -910,15 +989,24 @@ class Component extends DCLogic {
   static fromC(c) {
     const C = Component;
     return {
-      title: c.title.trim(), description: c.desc, price: C.num(c.price), total: C.int(c.total), min_qty: Math.max(1, C.int(c.minQty)), spins_every: C.int(c.spinsEvery),
+      slug: C.slugify(c.slug) || C.slugify(c.title) || null, title: c.title.trim(), description: c.desc, price: C.num(c.price), total: C.int(c.total), min_qty: Math.max(1, C.int(c.minQty)), spins_every: C.int(c.spinsEvery),
       draw_info: c.drawInfo, images: String(c.imagesRaw || '').split('\n').map(x => x.trim()).filter(Boolean),
       combos: c.combos.filter(x => C.int(x.qty) > 0 && C.num(x.price) > 0).map(x => ({ qty: C.int(x.qty), price: C.num(x.price) })),
+      tiers: (c.tiers || []).filter(x => C.int(x.from) > 0 && C.num(x.price) > 0).map(x => ({ from: C.int(x.from), price: C.num(x.price) })).sort((a, b) => a.from - b.from),
       quick: String(c.quickRaw || '').split(',').map(x => C.int(x)).filter(Boolean),
       ranking_on: !!c.rankingOn, ranking_mode: c.rankingMode, ranking_text: c.rankingText,
       wheel: c.wheel.filter(w => String(w.label).trim()).map(w => ({ label: String(w.label).trim(), weight: Math.max(0, C.num(w.weight)), loss: !!w.loss }))
     };
   }
-  static priceFor(qty, c) { const cb = (c.combos || []).find(x => Component.int(x.qty) === qty && Component.num(x.price) > 0); return cb ? Component.num(cb.price) : qty * Component.num(c.price); }
+  static slugify(t) { return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60); }
+  static routeSlug() {
+    const q = new URLSearchParams(location.search).get('rifa'); if (q) return Component.slugify(q);
+    const seg = decodeURIComponent(location.pathname.split('/').filter(Boolean).pop() || '');
+    return seg && !/\.html?$/.test(seg) && seg !== 'admin' ? Component.slugify(seg) : '';
+  }
+  static linkFor(slug) { return `${location.origin}/${slug}`; }
+  static unitFor(qty, c) { const C = Component; let u = C.num(c.price); (c.tiers || []).forEach(t => { const f = C.int(t.from), p = C.num(t.price); if (f > 0 && p > 0 && qty >= f && p < u) u = p; }); return u; }
+  static priceFor(qty, c) { const C = Component; const cb = (c.combos || []).find(x => C.int(x.qty) === qty && C.num(x.price) > 0); return cb ? C.num(cb.price) : Math.round(qty * C.unitFor(qty, c) * 100) / 100; }
 
   state = {
     now: Date.now(), page: 'campanha', loading: true, campRow: null, camp: null, sold: 0, ranking: [], prizesOut: [], publicWins: [], prizeNumbers: [], pnOwners: {}, result: null,
@@ -928,7 +1016,7 @@ class Component extends DCLogic {
     wInput: '', wPhone: '', wDeg: 0, spinning: false, wResult: null, spinsLeft: 0, myWins: [],
     adm: false, email: '', pass: '', passErr: '', authBusy: false, tab: 'geral', aLoading: false,
     cEdit: null, dirty: false, saving: false, aOrders: [], aSpins: [], lastSync: 0,
-    upsell: false, openNums: {}, newPN: { number: '', prize: '' }, orderF: 'todos', orderQ: '', lookup: '', lookupRes: null,
+    aCamps: [], aSold: {}, admCampId: null, upsell: false, openNums: {}, newPN: { number: '', prize: '' }, orderF: 'todos', orderQ: '', lookup: '', lookupRes: null,
     fedForm: { concurso: '', date: '', p1: '', p2: '' }, toast: '',
     menu: false, dMode: null, installHelp: false, appHidden: localStorage.getItem('xc_app') === '0',
     cookie: localStorage.getItem('xc_cookie') === '1', age: localStorage.getItem('xc_18') || ''
@@ -942,6 +1030,7 @@ class Component extends DCLogic {
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
     if (window.matchMedia && matchMedia('(display-mode: standalone)').matches) this.setState({ appHidden: true });
     this._pnT = {};
+    try { const cr = JSON.parse(localStorage.getItem('xc_camp_' + (Component.routeSlug() || 'home')) || 'null'); if (cr && cr.id) this.setState({ campRow: cr, camp: Component.toC(cr), loading: false, qty: (cr.combos && cr.combos[0] && cr.combos[0].qty) || cr.min_qty || 1 }); } catch (e) {}
     const boot = () => {
       if (!window.supabase) return (this._bootT = setTimeout(boot, 120));
       this.sb = window.supabase.createClient(Component.SB_URL, Component.SB_KEY);
@@ -964,10 +1053,15 @@ class Component extends DCLogic {
   go(page) { if (page !== 'admin' && location.hash) history.replaceState(null, '', location.pathname + location.search); window.scrollTo(0, 0); this.setState({ page }); }
 
   async loadPublic() {
-    const { data, error } = await this.sb.from('campaigns').select('*').order('created_at', { ascending: false }).limit(1);
+    const slug = Component.routeSlug();
+    let q = this.sb.from('campaigns').select('*');
+    q = slug ? q.eq('slug', slug).limit(1) : q.order('created_at', { ascending: false }).limit(30);
+    const { data, error } = await q;
     if (error) { this.setState({ loading: false }); return this.err(error, 'Não foi possível carregar a campanha'); }
-    const r = data && data[0];
+    const r = data && (data.find(x => x.status === 'active') || data[0]);
     if (!r) return this.setState({ loading: false, campRow: null, camp: null });
+    try { localStorage.setItem('xc_camp_' + (slug || 'home'), JSON.stringify(r)); } catch (e) {}
+    if (slug && location.search.includes('rifa=')) history.replaceState(null, '', '/' + slug + location.hash);
     const firstQty = (r.combos && r.combos[0] && r.combos[0].qty) || r.min_qty || 1;
     this.setState(s => ({ campRow: r, camp: Component.toC(r), qty: s.qtyTouched ? s.qty : firstQty, cEdit: s.dirty ? s.cEdit : Component.toC(r) }));
     await Promise.all([this.loadPublicStats(r), this.loadPrizes(r.id), this.loadResult(r.id)]);
@@ -1019,7 +1113,7 @@ class Component extends DCLogic {
       clearInterval(this._payT);
       this.setState(s => ({ co: s.co ? { step: 'done', order: { ...s.co.order, status: 'paid' }, numbers: data.numbers || [] } : s.co }));
       this.loadPublicStats();
-      clearTimeout(this._upT); this._upT = setTimeout(() => { if (this.state.co && this.state.co.step === 'done') this.setState({ upsell: true }); }, 1800);
+      clearTimeout(this._upT); this._upT = setTimeout(() => { if (this.state.co && this.state.co.step === 'done') this.setState({ upsell: true }); }, 4000);
     } else if (!silent) {
       this.toast(mp && mp.status === 'approved' ? 'Pagamento aprovado! Gerando seus números…' : 'O PIX ainda não caiu. Assim que cair, esta tela atualiza sozinha.');
     }
@@ -1067,13 +1161,27 @@ class Component extends DCLogic {
   }
   async loadAdmin() {
     this.setState({ aLoading: true });
-    const { data, error } = await this.sb.from('campaigns').select('*').order('created_at', { ascending: false }).limit(1);
+    const { data, error } = await this.sb.from('campaigns').select('*').order('created_at', { ascending: false });
     if (error) { this.setState({ aLoading: false }); return this.err(error); }
-    const r = data && data[0];
+    const list = data || [];
+    const r = list.find(x => x.id === this.state.admCampId) || list.find(x => x.status === 'active') || list[0];
+    this.setState({ aCamps: list });
+    this.loadCampSold(list);
     if (!r) return this.setState({ aLoading: false, campRow: null, cEdit: null, camp: null });
-    this.setState(s => ({ campRow: r, camp: Component.toC(r), cEdit: s.dirty && s.cEdit ? s.cEdit : Component.toC(r) }));
+    this.setState(s => ({ admCampId: r.id, campRow: r, camp: Component.toC(r), cEdit: s.dirty && s.cEdit && s.campRow && s.campRow.id === r.id ? s.cEdit : Component.toC(r) }));
+    this.loadPublicStats(r);
     await Promise.all([this.loadOrders(r), this.loadPrizesAdm(r.id), this.loadResult(r.id), this.loadSpins(r.id)]);
     this.setState({ aLoading: false });
+  }
+  async loadCampSold(list) {
+    const res = await Promise.all(list.map(x => this.sb.rpc('campaign_public', { p_campaign: x.id }).then(({ data }) => [x.id, (data && data.sold) || 0])));
+    this.setState({ aSold: Object.fromEntries(res) });
+  }
+  async pickCamp(id) {
+    if (id === this.state.admCampId) return;
+    if (this.state.dirty && !confirm('Você tem alterações não salvas. Trocar de rifa mesmo assim?')) return;
+    this.setState({ admCampId: id, dirty: false, aOrders: [], aSpins: [], prizeNumbers: [], result: null, openNums: {}, sold: 0, tab: 'geral' });
+    await this.loadAdmin();
   }
   async loadOrders(r) {
     r = r || this.state.campRow; if (!r) return;
@@ -1096,10 +1204,11 @@ class Component extends DCLogic {
   }
   async loadSpins(id) { const { data } = await this.sb.from('spins').select('*').eq('campaign_id', id).order('created_at', { ascending: false }).limit(200); this.setState({ aSpins: data || [] }); }
   async createCampaign() {
-    if (this.state.campRow && !confirm('Criar uma nova rifa? A atual fica salva, mas o site passa a mostrar a nova.')) return;
-    const { error } = await this.sb.from('campaigns').insert({ title: 'Nova rifa', description: '', price: 1, total: 100000, min_qty: 1, spins_every: 0, combos: [], quick: [10, 25, 50, 100, 250, 500], wheel: [], ranking_on: false, ranking_text: '' });
+    if (this.state.dirty && !confirm('Você tem alterações não salvas. Criar nova rifa mesmo assim?')) return;
+    const slug = 'rifa-' + Date.now().toString(36).slice(-5);
+    const { data: nr, error } = await this.sb.from('campaigns').insert({ slug, title: 'Nova rifa', description: '', price: 1, total: 100000, min_qty: 1, spins_every: 0, combos: [], quick: [10, 25, 50, 100, 250, 500], wheel: [], ranking_on: false, ranking_text: '' }).select().single();
     if (error) return this.err(error);
-    this.setState({ dirty: false, tab: 'campanha', prizeNumbers: [], result: null });
+    this.setState({ admCampId: nr.id, dirty: false, tab: 'campanha', prizeNumbers: [], result: null, aOrders: [], aSpins: [], sold: 0 });
     await this.loadAdmin(); this.loadPublic();
     this.toast('Rifa criada. Configure os detalhes e salve.');
   }
@@ -1113,7 +1222,8 @@ class Component extends DCLogic {
     this.setState({ saving: true });
     const { data, error } = await this.sb.from('campaigns').update(row).eq('id', s.campRow.id).select().single();
     this.setState({ saving: false });
-    if (error) return this.err(error);
+    if (error) return /slug|duplicate|unique/i.test(error.message) ? this.toast('Esse link já é usado por outra rifa. Escolha outro.') : this.err(error);
+    this.setState(st => ({ aCamps: (st.aCamps || []).map(x => x.id === data.id ? data : x) }));
     this.setState({ campRow: data, camp: Component.toC(data), cEdit: Component.toC(data), dirty: false });
     this.toast('Alterações salvas');
   }
@@ -1221,6 +1331,9 @@ class Component extends DCLogic {
     const imgIdx = images.length ? s.imgIdx % images.length : 0;
     const qty = s.qty || 0, cost = C.priceFor(qty, c);
     const isCombo = (c.combos || []).some(x => C.int(x.qty) === qty && C.num(x.price) > 0);
+    const unitNow = C.unitFor(qty, c), tierList = (c.tiers || []).map(t => ({ from: C.int(t.from), price: C.num(t.price) })).filter(t => t.from > 0 && t.price > 0 && t.price < price).sort((a, b) => a.from - b.from);
+    const nextTier = tierList.find(t => t.from > qty && t.price < unitNow);
+    const tierLadder = tierList.length ? [{ from: minQty, price }, ...tierList].map((t, i, arr) => { const on = qty >= t.from && (!arr[i + 1] || qty < arr[i + 1].from); return { label: `${t.from.toLocaleString('pt-BR')}+ cotas`, price: C.brl(t.price), bg: on ? 'oklch(0.62 0.19 248)' : '#1e2630', border: on ? 'oklch(0.72 0.17 240)' : '#3d4a58', fg: on ? '#ffffff' : '#c9d1d9', onClick: () => setQ(Math.max(t.from, qty)) }; }) : [];
     const setQ = q => this.setState({ qty: Math.max(0, Math.min(q, total)), qtyTouched: true });
     const ranking = (s.ranking || []).map((r, i) => ({ pos: `${i + 1}º`, number: pad(r.number), name: r.name, when: C.ago(r.paid_at ? Date.parse(r.paid_at) : 0, now) }));
     const res = s.result;
@@ -1317,7 +1430,10 @@ class Component extends DCLogic {
       combos: (c.combos || []).filter(x => C.int(x.qty) > 0 && C.num(x.price) > 0).map(x => { const qq = C.int(x.qty), pp = C.num(x.price), off = Math.round((1 - pp / (qq * price || 1)) * 100); return { qty: qq, price: C.brl(pp), hasOff: off > 0, off: `-${off}%`, border: qq === qty ? 'oklch(0.72 0.17 240)' : '#34404d', onClick: () => setQ(qq) }; }),
       quick: String(c.quickRaw || '').split(',').map(x => C.int(x)).filter(Boolean).slice(0, 9).map(v => ({ label: `+${v}`, onClick: () => setQ(qty + v) })),
       qty, setQty: e => setQ(C.int(e.target.value)), qtyMinus: () => setQ(qty - 1), qtyPlus: () => setQ(qty + 1), qtyClear: () => setQ(0),
-      unitLabel: isCombo ? 'Combo promocional aplicado' : `${C.brl(price)}/un · mínimo ${minQty}`,
+      unitLabel: isCombo ? 'Combo promocional aplicado' : unitNow < price ? `${C.brl(unitNow)}/un (de ${C.brl(price)}) · economia de ${C.brl(qty * price - cost)}` : `${C.brl(price)}/un · mínimo ${minQty}`,
+      hasTiers: tierLadder.length > 0, tierLadder, hasNextTier: !!nextTier && !isCombo,
+      nextTierLabel: nextTier ? `Leve mais ${(nextTier.from - qty).toLocaleString('pt-BR')} cotas e pague ${C.brl(nextTier.price)} em cada uma` : '',
+      goNextTier: () => nextTier && setQ(nextTier.from),
       spinsEarn: spinsOn ? Math.floor(qty / every) : 0, hasSpinsEarn: spinsOn && Math.floor(qty / every) > 0, totalLabel: C.brl(cost),
       buyLabel: ended ? 'Esgotado' : 'Garantir números',
       openCheckout: () => {
@@ -1356,7 +1472,8 @@ class Component extends DCLogic {
       winners, noWinners: winners.length === 0,
 
       coOpen: !!co, coForm: coStep === 'form', coPix: coStep === 'pix', coDone: coStep === 'done',
-      coTitle: coStep === 'form' ? 'Finalizar compra' : coStep === 'pix' ? 'Pague com PIX' : 'Pagamento confirmado!',
+      coTitle: coStep === 'form' ? 'Finalizar compra' : coStep === 'pix' ? 'Pague com PIX' : 'Compra concluída',
+      doneThanks: `Obrigado, ${(String(s.form.name || '').trim().split(/\s+/)[0]) || 'pela compra'}!`, upsellOpen: () => { clearTimeout(this._upT); this.setState({ upsell: true }); },
       closeCheckout: () => { clearInterval(this._payT); this.setState({ co: null, pix: {} }); }, stop: e => e.stopPropagation(),
       form: s.form, coErr: s.coErr, genPix: () => this.genPix(), genLabel: s.coBusy ? 'Gerando…' : 'Gerar PIX',
       setFName: e => this.setState({ form: { ...s.form, name: e.target.value } }),
@@ -1367,6 +1484,7 @@ class Component extends DCLogic {
       upsellClose: () => this.setState({ upsell: false }),
       upsellOpts: (() => {
         let qs = (c.combos || []).map(x => C.int(x.qty)).filter(v => v >= minQty && C.num((c.combos.find(y => C.int(y.qty) === v) || {}).price) > 0);
+        if (!qs.length) qs = (c.tiers || []).map(t => C.int(t.from)).filter(v => v >= minQty);
         if (!qs.length) qs = String(c.quickRaw || '').split(',').map(x => C.int(x)).filter(v => v >= minQty);
         if (!qs.length) qs = [minQty * 5, minQty * 10, minQty * 25];
         qs = [...new Set(qs)].sort((a, b) => a - b).slice(-3);
@@ -1394,6 +1512,19 @@ class Component extends DCLogic {
       login: () => this.login(), passKey: e => { if (e.key === 'Enter') this.login(); }, loginLabel: s.authBusy ? 'Entrando…' : 'Entrar',
       logout: async () => { await this.sb.auth.signOut(); this.setState({ adm: false, pass: '' }); },
       aLoading: s.adm && s.aLoading && !hasCamp, noCampAdm: s.adm && !s.aLoading && !hasCamp, createCampaign: () => this.createCampaign(), statusLabel,
+      hasCampList: s.adm && (s.aCamps || []).length > 0,
+      campList: (s.aCamps || []).slice().sort((a, b) => (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1)).map(x => {
+        const sd = (s.aSold || {})[x.id] || 0, p = Math.min(100, sd / Math.max(1, x.total) * 100), on = x.id === s.admCampId;
+        const st = x.status === 'active' && sd < x.total ? ['Em andamento', 'oklch(0.8 0.15 150)', '#0d1a10'] : x.status === 'finished' ? ['Finalizada', '#3d4a58', '#c9d1d9'] : ['Esgotada', 'oklch(0.8 0.15 75)', '#1a1405'];
+        const link = x.slug ? C.linkFor(x.slug) : '';
+        return { title: x.title || 'Sem título', st: st[0], stBg: st[1], stFg: st[2], link: link.replace(/^https?:\/\//, '') || 'Sem link — defina em Campanha', pct: p.toFixed(p < 1 ? 2 : 0).replace('.', ',') + '%', pctW: p.toFixed(2),
+          sold: `${sd.toLocaleString('pt-BR')} de ${Number(x.total).toLocaleString('pt-BR')} cotas`, border: on ? 'oklch(0.72 0.17 240)' : '#34404d', bg: on ? '#2b3644' : '#26303b', editLabel: on ? 'Editando' : 'Gerenciar',
+          onPick: () => this.pickCamp(x.id), onCopy: () => { if (!link) return; navigator.clipboard && navigator.clipboard.writeText(link); this.toast('Link copiado'); }, onOpen: () => link && window.open(link, '_blank') };
+      }),
+      slugVal: c.slug || '', slugFull: C.linkFor(C.slugify(c.slug) || 'seu-link'),
+      setSlug: e => this.setC({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-{2,}/g, '-') }),
+      slugFromTitle: () => this.setC({ slug: C.slugify(c.title) }),
+      copySlug: () => { const l = C.linkFor(C.slugify(c.slug)); if (!C.slugify(c.slug)) return this.toast('Defina o link primeiro'); navigator.clipboard && navigator.clipboard.writeText(l); this.toast(s.dirty ? 'Link copiado — lembre de salvar' : 'Link copiado'); },
       tabs: campOK ? [['geral', 'Dashboard'], ['campanha', 'Campanha'], ['cotas', 'Cotas premiadas'], ['roleta', 'Roleta'], ['pedidos', 'Pedidos'], ['sorteio', 'Sorteio']].map(([k, label]) => ({ label, bg: s.tab === k ? '#f2f5f7' : 'transparent', fg: s.tab === k ? '#1e2630' : '#f2f5f7', onClick: () => this.setState({ tab: k }) })) : [],
       tGeral: campOK && s.tab === 'geral', tCampanha: campOK && s.tab === 'campanha', tCotas: campOK && s.tab === 'cotas', tRoleta: campOK && s.tab === 'roleta', tPedidos: campOK && s.tab === 'pedidos', tSorteio: campOK && s.tab === 'sorteio',
       refresh: () => this.loadAdmin(), lastSyncLabel: s.lastSync ? `Atualizado ${C.ago(s.lastSync, now)} · atualiza sozinho a cada 10s` : '',
@@ -1421,6 +1552,8 @@ class Component extends DCLogic {
       f: fields, setRankingOn: e => this.setC({ rankingOn: e.target.checked }),
       comboRows: (c.combos || []).map((x, i) => ({ qty: x.qty, price: x.price, onQty: e => updArr('combos', i, { qty: e.target.value }), onPrice: e => updArr('combos', i, { price: e.target.value }), onRemove: () => rmArr('combos', i) })),
       addCombo: () => this.setC({ combos: [...(c.combos || []), { qty: '', price: '' }] }),
+      tierRows: (c.tiers || []).map((x, i) => ({ from: x.from, price: x.price, onFrom: e => updArr('tiers', i, { from: e.target.value.replace(/\D/g, '') }), onPrice: e => updArr('tiers', i, { price: e.target.value }), onRemove: () => this.setC({ tiers: (c.tiers || []).filter((_, j) => j !== i) }) })),
+      addTier: () => this.setC({ tiers: [...(c.tiers || []), { from: '', price: '' }] }),
       newPN: s.newPN, rangeLabel: `${pad(0)} a ${pad(total - 1)}`,
       setPNNumber: e => this.setState({ newPN: { ...s.newPN, number: e.target.value.replace(/\D/g, '') } }),
       setPNPrize: e => this.setState({ newPN: { ...s.newPN, prize: e.target.value } }),
