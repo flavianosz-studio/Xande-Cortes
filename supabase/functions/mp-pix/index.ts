@@ -18,7 +18,6 @@ Deno.serve(async (req) => {
     const { data: o, error } = await sb.from('orders').select('*, campaigns(title)').eq('id', order_id).single();
     if (error || !o) return json({ error: 'Pedido não encontrado: ' + (error?.message ?? order_id) });
     if (o.status === 'paid') return json({ status: 'paid' });
-    if (o.status !== 'pending') return json({ error: 'Pedido já processado' });
 
     // ---- verificação do pagamento ----
     if (check) {
@@ -39,6 +38,8 @@ Deno.serve(async (req) => {
     }
 
     // ---- gerar PIX ----
+    if (o.status === 'expired') return json({ error: 'Pedido vencido: passou de 30 minutos e as cotas foram liberadas. Faça um novo pedido.' });
+    if (o.status !== 'pending') return json({ error: 'Pedido já processado' });
     if (o.pix_code) return json({ qr_code: o.pix_code, qr_code_base64: o.pix_qr });
     const first = String(o.name).trim().split(/\s+/)[0] || 'Cliente';
     const r = await mp('/v1/payments', {

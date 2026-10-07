@@ -20,7 +20,7 @@ Deno.serve(async (req) => {
     if (p.status === 'approved' && p.external_reference) {
       const sb = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
       const { data: o } = await sb.from('orders').select('id,total,status').eq('id', p.external_reference).single();
-      if (o && o.status === 'pending' && Number(p.transaction_amount) >= Number(o.total) - 0.01) {
+      if (o && (o.status === 'pending' || o.status === 'expired') && Number(p.transaction_amount) >= Number(o.total) - 0.01) {
         const { error } = await sb.rpc('system_confirm_order', { p_order: o.id });
         console.log('confirmado', o.id, error ? 'ERRO ' + error.message : 'ok');
       }

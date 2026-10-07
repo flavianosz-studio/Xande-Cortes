@@ -764,7 +764,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
                   <span style="font-size:12px;font-weight:700;color:#9aa6b2;">{{ o.numsLabel }}</span>
                   <div style="display:flex;flex-wrap:wrap;gap:5px;max-height:220px;overflow:auto;">
                     <sc-for list="{{ o.chips }}" as="ch">
-                      <span style="font-variant-numeric:tabular-nums;font-size:12px;font-weight:700;padding:4px 7px;border-radius:6px;background:{{ ch.bg }};color:{{ ch.fg }};">{{ ch.n }}</span>
+                      <span style="font-variant-numeric:tabular-nums;font-size:12px;font-weight:700;padding:4px 7px;border-radius:6px;background:{{ ch.bg }};color:{{ ch.fg }};text-decoration:{{ ch.deco }};">{{ ch.n }}</span>
                     </sc-for>
                   </div>
                 </div>
@@ -861,7 +861,29 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         <button onClick="{{ genPix }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;border-radius:14px;padding:16px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-size:16px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">{{ genLabel }}</button>
       </sc-if>
 
-      <sc-if value="{{ coPix }}">
+      <sc-if value="{{ pixExpired }}">
+        <div style="background:#2a1d1c;border:1px solid oklch(0.45 0.12 25);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px;">
+          <span style="font-size:16px;font-weight:800;color:oklch(0.8 0.13 25);">Pedido vencido</span>
+          <span style="font-size:13px;color:#c9d1d9;line-height:1.5;">O prazo de 30 minutos para pagamento acabou e as cotas reservadas foram liberadas para outras pessoas. Faça um novo pedido para participar.</span>
+        </div>
+        <button onClick="{{ newOrder }}" style="border:none;border-radius:14px;padding:16px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));color:#ffffff;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;" style-hover="filter:brightness(1.08);">Fazer novo pedido</button>
+      </sc-if>
+      <sc-if value="{{ pixActive }}">
+        <sc-if value="{{ hasReserved }}">
+          <div style="background:#1e2630;border:1px solid #34404d;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span style="font-size:13px;font-weight:800;">{{ reservedLabel }}</span>
+              <span style="font-size:11px;font-weight:800;padding:3px 8px;border-radius:999px;background:oklch(0.8 0.15 75);color:#1a1405;">Aguardando pagamento</span>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px;max-height:120px;overflow:auto;">
+              <sc-for list="{{ reservedChips }}" as="ch">
+                <span style="font-variant-numeric:tabular-nums;font-size:12px;font-weight:700;padding:4px 7px;border-radius:6px;background:{{ ch.bg }};color:{{ ch.fg }};">{{ ch.n }}</span>
+              </sc-for>
+            </div>
+            <span style="font-size:12px;color:#9aa6b2;line-height:1.5;">Esses números são seus se o PIX for pago em até 30 minutos. Depois disso, o pedido vence e eles voltam a ficar disponíveis.</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ reservedLoading }}"><span style="font-size:12px;color:#9aa6b2;">Reservando seus números…</span></sc-if>
         <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;">
           <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:26px;font-weight:700;color:oklch(0.72 0.17 240);">{{ coTotal }}</span>
           <span style="font-size:13px;color:#9aa6b2;">expira em <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;color:#f2f5f7;font-weight:700;">{{ pixTimer }}</span></span>
@@ -1088,7 +1110,13 @@ class Component extends DCLogic {
     if (error) return this.setState({ coErr: error.message });
     this.openPix(Array.isArray(data) ? data[0] : data);
   }
-  openPix(o) { this.setState({ co: { step: 'pix', order: o }, pix: { loading: true } }); this.loadPix(o); clearInterval(this._payT); this._payT = setInterval(() => this.checkPay(o.id, true), 5000); }
+  openPix(o) { this.setState({ co: { step: 'pix', order: o, reserved: null }, pix: { loading: true } }); this.loadPix(o); this.loadReserved(o.id); clearInterval(this._payT); this._payT = setInterval(() => this.checkPay(o.id, true), 5000); }
+  async loadReserved(id) {
+    const { data } = await this.sb.rpc('order_status', { p_order: id });
+    if (!data) return;
+    if (data.status === 'expired') { clearInterval(this._payT); this.setState(s => s.co && s.co.order && s.co.order.id === id ? { co: { ...s.co, expired: true, reserved: [] } } : null); return; }
+    this.setState(s => s.co && s.co.order && s.co.order.id === id ? { co: { ...s.co, reserved: data.numbers || [] } } : null);
+  }
   async loadPix(o) {
     try {
       const { data, error } = await this.sb.functions.invoke('mp-pix', { body: { order_id: o.id } });
@@ -1185,12 +1213,13 @@ class Component extends DCLogic {
   }
   async loadOrders(r) {
     r = r || this.state.campRow; if (!r) return;
+    try { await this.sb.rpc('expire_orders'); } catch (e) {}
     let all = [], from = 0;
     for (;;) {
       const { data, error } = await this.sb.from('orders').select('id,name,phone,qty,total,status,created_at,paid_at').eq('campaign_id', r.id).order('created_at', { ascending: false }).range(from, from + 999);
       if (error || !data) break; all = all.concat(data); if (data.length < 1000) break; from += 1000;
     }
-    const { count } = await this.sb.from('order_numbers').select('*', { count: 'exact', head: true }).eq('campaign_id', r.id);
+    const count = all.filter(o => o.status === 'paid').reduce((a, o) => a + o.qty, 0);
     this.setState({ aOrders: all.map(o => ({ ...o, total: Number(o.total), createdAt: Date.parse(o.created_at), paidAt: o.paid_at ? Date.parse(o.paid_at) : null })), sold: count || 0, lastSync: Date.now() });
   }
   async loadPrizesAdm(id) {
@@ -1270,6 +1299,8 @@ class Component extends DCLogic {
   async toggleNums(id) {
     if (this.state.openNums[id]) return this.setState(s => { const m = { ...s.openNums }; delete m[id]; return { openNums: m }; });
     this.setState(s => ({ openNums: { ...s.openNums, [id]: true } }));
+    const ord = (this.state.aOrders || []).find(x => x.id === id);
+    if (ord && ord.status === 'expired') { const { data: ex } = await this.sb.from('orders').select('expired_numbers').eq('id', id).single(); return this.setState(s => s.openNums[id] ? { openNums: { ...s.openNums, [id]: (ex && ex.expired_numbers) || [] } } : null); }
     const { data, error } = await this.sb.from('order_numbers').select('number').eq('order_id', id).order('number').range(0, 9999);
     if (error) return this.err(error);
     this.setState(s => s.openNums[id] ? { openNums: { ...s.openNums, [id]: (data || []).map(x => x.number) } } : null);
@@ -1326,7 +1357,9 @@ class Component extends DCLogic {
     const prizeSet = new Map(s.prizeNumbers.map(p => [p.number, p.prize]));
     const outMap = new Map(s.prizesOut.map(x => [x.number, x.name]));
     const chipsFor = nums => (nums || []).slice(0, 3000).map(n => prizeSet.has(n) ? { n: pad(n), bg: 'oklch(0.8 0.15 150)', fg: '#0d1a10' } : { n: pad(n), bg: '#2e3946', fg: '#f2f5f7' });
-    const st = o => o.status === 'paid' ? { status: 'Pago', stBg: 'oklch(0.8 0.15 150)', stFg: '#0d1a10' } : o.status === 'canceled' ? { status: 'Cancelado', stBg: '#3d4a58', stFg: '#c9d1d9' } : { status: 'Aguardando', stBg: '#3a3320', stFg: 'oklch(0.85 0.13 75)' };
+    const isExp = o => o.status === 'expired' || (o.status === 'pending' && (o.createdAt || Date.parse(o.created_at)) + 30 * 60000 < now);
+    const st0 = o => o.status === 'paid' ? { status: 'Pago', stBg: 'oklch(0.8 0.15 150)', stFg: '#0d1a10' } : o.status === 'canceled' ? { status: 'Cancelado', stBg: '#3d4a58', stFg: '#c9d1d9' } : { status: 'Aguardando', stBg: '#3a3320', stFg: 'oklch(0.85 0.13 75)' };
+    const st = o => isExp(o) ? { status: 'Vencido', stBg: 'oklch(0.45 0.12 25)', stFg: '#ffe9e6' } : st0(o);
     const images = String(c.imagesRaw || '').split('\n').map(x => x.trim()).filter(Boolean);
     const imgIdx = images.length ? s.imgIdx % images.length : 0;
     const qty = s.qty || 0, cost = C.priceFor(qty, c);
@@ -1339,7 +1372,7 @@ class Component extends DCLogic {
     const res = s.result;
 
     const myOrders = (s.myOrders || []).map(o => ({
-      id: o.id, qty: o.qty, total: C.brl(o.total), date: C.date(Date.parse(o.created_at)), ...st(o), isPaid: o.status === 'paid', isPending: o.status === 'pending', chips: chipsFor(o.numbers),
+      id: o.id, qty: o.qty, total: C.brl(o.total), date: C.date(Date.parse(o.created_at)), ...st(o), isPaid: o.status === 'paid', isPending: o.status === 'pending' && !isExp(o), chips: chipsFor(o.numbers),
       onPay: () => this.openPix({ id: o.id, qty: o.qty, total: Number(o.total), created_at: o.created_at })
     }));
 
@@ -1366,7 +1399,7 @@ class Component extends DCLogic {
     const doneSpins = coOrder && spinsOn ? Math.floor(coOrder.qty / every) : 0;
 
     // ADMIN
-    const aOrders = s.aOrders, paid = aOrders.filter(o => o.status === 'paid'), pending = aOrders.filter(o => o.status === 'pending');
+    const aOrders = s.aOrders, paid = aOrders.filter(o => o.status === 'paid'), pending = aOrders.filter(o => o.status === 'pending' && !isExp(o));
     const revenue = paid.reduce((a, o) => a + o.total, 0);
     const d0 = new Date(); d0.setHours(0, 0, 0, 0); const today0 = d0.getTime();
     const revToday = paid.filter(o => o.paidAt >= today0).reduce((a, o) => a + o.total, 0);
@@ -1381,14 +1414,14 @@ class Component extends DCLogic {
     const ddmm = t => new Date(t).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
     const bucketsDef = [['1 a 49 cotas', 1, 49], ['50 a 99', 50, 99], ['100 a 249', 100, 249], ['250 a 499', 250, 499], ['500 ou mais', 500, Infinity]];
     const q = s.orderQ.toLowerCase().trim();
-    const orderRows = aOrders.filter(o => s.orderF === 'todos' || (s.orderF === 'pagos' ? o.status === 'paid' : o.status === 'pending'))
+    const orderRows = aOrders.filter(o => s.orderF === 'todos' || (s.orderF === 'pagos' ? o.status === 'paid' : s.orderF === 'vencidos' ? isExp(o) : o.status === 'pending' && !isExp(o)))
       .filter(o => !q || o.name.toLowerCase().includes(q) || (C.digits(q) && o.phone.includes(C.digits(q))) || o.id.toLowerCase().includes(q))
       .slice(0, 300).map(o => ({
-        id: o.id, name: o.name, phone: C.fmtPhone(o.phone), date: C.date(o.createdAt), qty: o.qty, total: C.brl(o.total), ...st(o), isPending: o.status === 'pending',
+        id: o.id, name: o.name, phone: C.fmtPhone(o.phone), date: C.date(o.createdAt), qty: o.qty, total: C.brl(o.total), ...st(o), isPending: o.status === 'pending' && !isExp(o),
         onConfirm: () => this.confirmOrder(o), onDelete: () => this.deleteOrder(o),
-        isPaid: o.status === 'paid', open: !!s.openNums[o.id], toggleLabel: s.openNums[o.id] ? 'Ocultar cotas' : 'Ver cotas',
-        numsLabel: Array.isArray(s.openNums[o.id]) ? `${s.openNums[o.id].length} cotas · premiadas em verde` : 'Carregando…',
-        chips: Array.isArray(s.openNums[o.id]) ? chipsFor(s.openNums[o.id]) : [],
+        isPaid: o.status !== 'canceled', open: !!s.openNums[o.id], toggleLabel: s.openNums[o.id] ? 'Ocultar cotas' : 'Ver cotas',
+        numsLabel: Array.isArray(s.openNums[o.id]) ? (isExp(o) ? (s.openNums[o.id].length ? `${s.openNums[o.id].length} cotas vencidas · já liberadas para outras pessoas` : 'Pedido vencido · cotas já liberadas para outras pessoas') : `${s.openNums[o.id].length} cotas${o.status === 'pending' ? ' reservadas (aguardando pagamento)' : ''} · premiadas em verde`) : 'Carregando…',
+        chips: Array.isArray(s.openNums[o.id]) ? (isExp(o) ? s.openNums[o.id].map(n => ({ n: `${pad(n)}`, bg: 'oklch(0.32 0.07 25)', fg: '#f3c9c3', deco: 'line-through' })) : chipsFor(s.openNums[o.id]).map(x => ({ ...x, deco: 'none' }))) : [],
         onToggle: () => this.toggleNums(o.id)
       }));
     const resOwner = res ? aOrders.find(o => o.id === res.order_id) : null;
@@ -1479,6 +1512,11 @@ class Component extends DCLogic {
       setFName: e => this.setState({ form: { ...s.form, name: e.target.value } }),
       setFPhone: e => this.setState({ form: { ...s.form, phone: C.fmtPhone(e.target.value) } }),
       setFTerms: e => this.setState({ form: { ...s.form, terms: e.target.checked } }),
+      pixExpired: coStep === 'pix' && (!!(co && co.expired) || pixLeft <= 0), pixActive: coStep === 'pix' && !(co && co.expired) && pixLeft > 0,
+      hasReserved: coStep === 'pix' && !!(co && co.reserved && co.reserved.length) && !(co && co.expired) && pixLeft > 0,
+      reservedChips: chipsFor((co && co.reserved) || []), reservedLabel: `Suas ${((co && co.reserved) || []).length.toLocaleString('pt-BR')} cotas reservadas`,
+      reservedLoading: coStep === 'pix' && !(co && co.reserved) && !(co && co.expired),
+      newOrder: () => { clearInterval(this._payT); this.setState({ co: { step: 'form' }, pix: {} }); },
       coTotal: coOrder ? C.brl(coOrder.total) : '', coOrderId: coOrder ? coOrder.id : '', pixTimer, pixCode, qrSrc: qrSrc || '', hasQr: !!qrSrc, noQr: !qrSrc,
       upsellShow: !!s.upsell && coStep === 'done',
       upsellClose: () => this.setState({ upsell: false }),
@@ -1563,7 +1601,7 @@ class Component extends DCLogic {
       wheelRows: wheel.map((w, i) => ({ label: w.label, weight: w.weight, loss: !!w.loss, swatch: segCol(i), prob: `${Math.round(Math.max(0, C.num(w.weight)) / wSum * 100)}%`, onLabel: e => updArr('wheel', i, { label: e.target.value }), onWeight: e => updArr('wheel', i, { weight: e.target.value.replace(/[^\d.,]/g, '') }), onLoss: e => updArr('wheel', i, { loss: e.target.checked }), onRemove: () => rmArr('wheel', i) })),
       addWheel: () => this.setC({ wheel: [...wheel, { label: 'Novo prêmio', weight: '10', loss: false }] }),
       spinLog: s.aSpins.slice(0, 50).map(g => ({ name: g.name || C.fmtPhone(g.phone), label: g.label, when: C.ago(Date.parse(g.created_at), now), color: g.loss ? '#9aa6b2' : 'oklch(0.8 0.15 150)' })), noSpinLog: s.aSpins.length === 0,
-      orderFilters: [['todos', `Todos (${aOrders.length})`], ['pendentes', `Pendentes (${pending.length})`], ['pagos', `Pagos (${paid.length})`]].map(([k, label]) => ({ label, bg: s.orderF === k ? '#f2f5f7' : 'transparent', fg: s.orderF === k ? '#1e2630' : '#f2f5f7', onClick: () => this.setState({ orderF: k }) })),
+      orderFilters: [['todos', `Todos (${aOrders.length})`], ['pendentes', `Pendentes (${pending.length})`], ['pagos', `Pagos (${paid.length})`], ['vencidos', `Vencidos (${aOrders.filter(isExp).length})`]].map(([k, label]) => ({ label, bg: s.orderF === k ? '#f2f5f7' : 'transparent', fg: s.orderF === k ? '#1e2630' : '#f2f5f7', onClick: () => this.setState({ orderF: k }) })),
       orderQ: s.orderQ, setOrderQ: e => this.setState({ orderQ: e.target.value }), orderRows, noOrders: aOrders.length === 0 || orderRows.length === 0,
       fedRule: digits > 5
         ? `O número ganhador é formado pelos ${digits - 5} último(s) algarismo(s) do 2º prêmio seguidos dos 5 algarismos do 1º prêmio da Loteria Federal. Se esse número não tiver sido vendido, ganha o próximo número vendido acima dele; se não houver, o último vendido abaixo.`
