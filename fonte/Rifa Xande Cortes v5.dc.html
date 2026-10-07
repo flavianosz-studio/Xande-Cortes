@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1e2630">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{margin:0;background:#1e2630;color:#f2f5f7;font-family:Montserrat,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:oklch(0.72 0.17 240)}
+a:hover{color:#f2f5f7}
+input,textarea,select,button{font-family:inherit}
+button:disabled{cursor:not-allowed!important;opacity:.6}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+@keyframes xcpulse{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes xcstripe{from{background-position:0 0}to{background-position:28.28px 0}}
+</style>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1e2630"/><circle cx="50" cy="50" r="30" fill="#1e96f0"/><text x="50" y="58" font-family="sans-serif" font-size="22" font-weight="800" fill="#fff" text-anchor="middle">XC</text></svg></template>
+</helmet>
+
+<sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
+<div style="min-height:100vh;display:flex;flex-direction:column;">
+  <header style="position:sticky;top:0;z-index:20;background:rgba(30,38,48,.94);backdrop-filter:blur(10px);border-bottom:1px solid #34404d;">
+    <div style="max-width:560px;margin:0 auto;padding:10px 16px;display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:12px;">
+      <button onClick="{{ openMenu }}" aria-label="Menu" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;width:44px;height:44px;border-radius:14px;border:1px solid #3d4a58;background:transparent;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;padding:0 11px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">
+        <span style="width:20px;height:2px;background:#f2f5f7;border-radius:2px;"></span>
+        <span style="width:14px;height:2px;background:#f2f5f7;border-radius:2px;"></span>
+        <span style="width:9px;height:2px;background:oklch(0.72 0.17 240);border-radius:2px;"></span>
+      </button>
+      <img onClick="{{ goHome }}" src="logo-xande-cortes.png" alt="Xande Cortes" style="justify-self:center;height:54px;width:auto;display:block;cursor:pointer;transition:transform .2s ease;" style-hover="transform:scale(1.04) rotate(-1deg);">
+      <a href="https://wa.me/558197399489" target="_blank" style="font-size:13px;font-weight:700;color:oklch(0.72 0.17 240);text-decoration:none;">Suporte</a>
+    </div>
+  </header>
+
+  <div style="position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;overflow:hidden;z-index:40;pointer-events:{{ menuPE }};">
+    <div onClick="{{ closeMenu }}" style="position:absolute;inset:0;background:rgba(0,0,0,.65);opacity:{{ menuOp }};transition:opacity .25s ease;"></div>
+    <aside style="position:absolute;top:0;bottom:0;left:0;width:100%;background:#000;transform:translateX({{ menuX }});transition:transform .32s cubic-bezier(.2,.8,.2,1);overflow:auto;display:flex;flex-direction:column;">
+      <div style="display:grid;grid-template-columns:48px 1fr 48px;align-items:center;padding:14px 16px;border-bottom:1px solid #1c1c1c;">
+        <span></span>
+        <img src="logo-xande-cortes.png" alt="Xande Cortes" style="justify-self:center;height:50px;width:auto;display:block;">
+        <button onClick="{{ closeMenu }}" aria-label="Fechar" style="width:48px;height:48px;border-radius:50%;border:1px solid #3a3a3a;background:#111;color:#f2f5f7;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .25s ease,border-color .18s ease;" style-hover="transform:rotate(90deg);border-color:#666;" style-active="transform:scale(.92);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f2f5f7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+      </div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
+        <div style="background:#111;border:1px solid #262626;border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <span style="font-size:18px;font-weight:700;color:#f2f5f7;">{{ dTitle }}</span>
+            <span style="font-size:14px;color:#9a9a9a;">{{ dSub }}</span>
+          </div>
+          <sc-if value="{{ dIdle }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button onClick="{{ dEntrar }}" style="display:flex;align-items:center;gap:8px;border:none;border-radius:16px;padding:14px 22px;background:#ededed;color:#111;font-size:16px;font-weight:700;cursor:pointer;transition:transform .18s ease,background-color .18s ease;" style-hover="transform:translateY(-2px);background-color:#ffffff;" style-active="transform:scale(.96);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M10 4h9v16h-9M3 12h11M10 8l4 4-4 4"></path></svg>Entrar</button>
+              <button onClick="{{ dCadastro }}" style="border:1px solid #3a3a3a;border-radius:16px;padding:14px 22px;background:transparent;color:#f2f5f7;font-size:16px;font-weight:700;cursor:pointer;transition:transform .18s ease,border-color .18s ease,background-color .18s ease;" style-hover="transform:translateY(-2px);border-color:#777;background-color:#181818;" style-active="transform:scale(.96);">Criar cadastro</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ dIsCadastro }}">
+            <input value="{{ form.name }}" onChange="{{ setFName }}" placeholder="Nome completo" style="flex:1;min-width:0;background:#000;border:1px solid #2a2a2a;border-radius:14px;padding:14px;color:#f2f5f7;font-size:15px;outline:none;transition:border-color .18s ease;" style-focus="border-color:oklch(0.72 0.17 240);">
+          </sc-if>
+          <sc-if value="{{ dForm }}">
+            <input value="{{ search }}" onChange="{{ setSearch }}" onKeyDown="{{ drawerKey }}" placeholder="Seu WhatsApp" inputMode="numeric" style="flex:1;min-width:0;background:#000;border:1px solid #2a2a2a;border-radius:14px;padding:14px;color:#f2f5f7;font-size:15px;outline:none;transition:border-color .18s ease;" style-focus="border-color:oklch(0.72 0.17 240);">
+            <div style="display:flex;gap:10px;">
+              <button onClick="{{ dSubmit }}" style="flex:1;border:none;border-radius:16px;padding:14px;background:#ededed;color:#111;font-size:15px;font-weight:700;cursor:pointer;transition:transform .18s ease;" style-hover="transform:translateY(-2px);" style-active="transform:scale(.97);">{{ dSubmitLabel }}</button>
+              <button onClick="{{ dCancel }}" style="border:1px solid #3a3a3a;border-radius:16px;padding:14px 18px;background:transparent;color:#9a9a9a;font-size:15px;font-weight:600;cursor:pointer;transition:border-color .18s ease;" style-hover="border-color:#777;">Voltar</button>
+            </div>
+          </sc-if>
+        </div>
+        <span style="margin:22px 4px 4px;font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#4d4d4d;">Principal</span>
+        <sc-for list="{{ drawerMain }}" as="dm" hint-placeholder-count="4">
+          <button onClick="{{ dm.onClick }}" style="display:flex;align-items:center;gap:20px;width:100%;text-align:left;background:#0f0f0f;border:1px solid #222;border-radius:18px;padding:20px 22px;font-size:17px;font-weight:500;text-decoration:none;cursor:pointer;transition:transform .18s ease,background-color .18s ease,border-color .18s ease;color:#f2f5f7;border-color:{{ dm.border }};" style-hover="transform:translateX(4px);background-color:#161616;border-color:#3a3a3a;" style-active="transform:scale(.98);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8e8e8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="{{ dm.d }}"></path></svg><span>{{ dm.label }}</span></button>
+        </sc-for>
+        <span style="margin:22px 4px 4px;font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#4d4d4d;">Comunidade</span>
+        <a href="https://wa.me/558197399489" target="_blank" style="display:flex;align-items:center;gap:20px;width:100%;text-align:left;background:#0f0f0f;border:1px solid #222;border-radius:18px;padding:20px 22px;font-size:17px;font-weight:500;text-decoration:none;cursor:pointer;transition:transform .18s ease,background-color .18s ease,border-color .18s ease;color:#f2f5f7;" style-hover="transform:translateX(4px);background-color:#161616;border-color:#3a3a3a;" style-active="transform:scale(.98);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8e8e8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M4 14v-2a8 8 0 0 1 16 0v2M4 14h3v6H4zM17 14h3v6h-3z"></path></svg><span>Suporte</span></a>
+        <sc-if value="{{ appShow }}">
+          <button onClick="{{ installApp }}" style="display:flex;align-items:center;gap:20px;width:100%;text-align:left;background:#0f0f0f;border:1px solid #222;border-radius:18px;padding:20px 22px;font-size:17px;font-weight:500;text-decoration:none;cursor:pointer;transition:transform .18s ease,background-color .18s ease,border-color .18s ease;color:#f2f5f7;" style-hover="transform:translateX(4px);background-color:#161616;border-color:#3a3a3a;" style-active="transform:scale(.98);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e8e8e8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg><span>Instalar app</span></button>
+        </sc-if>
+        <span style="margin:22px 4px 4px;font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#4d4d4d;">Legal</span>
+        <div style="display:flex;gap:12px;align-items:center;font-size:16px;padding:0 4px 24px;"><a href="#" style="color:#a0a0a0;text-decoration:none;">Termos</a><span style="color:#4d4d4d;">·</span><a href="#" style="color:#a0a0a0;text-decoration:none;">Privacidade</a><span style="color:#4d4d4d;">·</span><a href="#" style="color:#a0a0a0;text-decoration:none;">Cookies</a></div>
+      </div>
+    </aside>
+  </div>
+
+  <main style="flex:1;width:100%;max-width:560px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:22px;">
+
+    <sc-if value="{{ isCampanha }}" hint-placeholder-val="{{ true }}">
+    <sc-if value="{{ hasCamp }}" hint-placeholder-val="{{ true }}">
+      <div style="margin:-16px -16px 0;display:flex;flex-direction:column;">
+      <div style="position:relative;aspect-ratio:1/1;max-height:560px;overflow:hidden;background:repeating-linear-gradient(135deg,#26303b 0 12px,#2a3440 12px 24px);">
+        <sc-if value="{{ hasImg }}">
+          <img src="{{ img }}" alt="Prêmio" style="width:100%;height:100%;object-fit:cover;display:block;">
+        </sc-if>
+        <sc-if value="{{ noImg }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;top:0;left:0;right:0;height:55%;display:flex;align-items:center;justify-content:center;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:12px;color:#9aa6b2;text-align:center;padding:20px;">foto do prêmio — adicione no painel admin</div>
+        </sc-if>
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,38,48,0) 40%,rgba(30,38,48,.82) 72%,#1e2630 100%);pointer-events:none;"></div>
+        <sc-if value="{{ multiImg }}">
+          <button onClick="{{ prevImg }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;position:absolute;left:12px;top:38%;width:40px;height:40px;border-radius:50%;border:none;background:rgba(30,38,48,.6);color:#f2f5f7;font-size:20px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">‹</button>
+          <button onClick="{{ nextImg }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;position:absolute;right:12px;top:38%;width:40px;height:40px;border-radius:50%;border:none;background:rgba(30,38,48,.6);color:#f2f5f7;font-size:20px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">›</button>
+          <div style="position:absolute;top:14px;right:14px;display:flex;gap:6px;">
+            <sc-for list="{{ dots }}" as="d">
+              <span onClick="{{ d.onClick }}" style="width:8px;height:8px;border-radius:50%;background:{{ d.bg }};cursor:pointer;"></span>
+            </sc-for>
+          </div>
+        </sc-if>
+        <div style="position:absolute;left:16px;right:16px;bottom:18px;display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <sc-if value="{{ hot }}"><span style="background:oklch(0.72 0.17 240);color:#ffffff;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:6px 10px;border-radius:999px;">Corre que está acabando</span></sc-if>
+            <span style="background:rgba(30,38,48,.7);border:1px solid #3d4a58;color:#f2f5f7;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:6px 10px;border-radius:999px;">{{ c.drawInfo }}</span>
+          </div>
+          <h1 style="margin:0;font-size:28px;line-height:1.15;font-weight:700;letter-spacing:-0.01em;text-wrap:balance;">{{ c.title }}</h1>
+          <p style="margin:0;color:#c9d1d9;font-size:15px;line-height:1.45;text-wrap:pretty;">{{ c.desc }}</p>
+        </div>
+      </div>
+
+      <button onClick="{{ goMeus }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;width:100%;border:none;background:#0f1419;color:#f2f5f7;padding:16px;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Meus títulos <span style="color:oklch(0.72 0.17 240);">→</span></button>
+        <div style="position:relative;height:26px;background:#2e3946;overflow:hidden;">
+          <div style="height:100%;width:{{ pctStr }}%;min-width:52px;background:repeating-linear-gradient(-45deg,oklch(0.72 0.17 240) 0 10px,oklch(0.6 0.19 250) 10px 20px);animation:xcstripe 1s linear infinite;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;transition:width .8s ease;">
+            <span style="font-size:12px;font-weight:800;color:#ffffff;">{{ pctLabel }}</span>
+          </div>
+        </div>
+      </div>
+
+      <section style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:15px;color:#9aa6b2;">Por apenas</span>
+          <span style="background:#0f1419;border:1px solid #34404d;border-radius:10px;padding:8px 12px;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:18px;font-weight:700;color:#ffffff;">{{ priceLabel }}</span>
+        </div>
+      </section>
+
+      <sc-if value="{{ hasRes }}">
+        <section style="background:#26303b;border:2px solid oklch(0.72 0.17 240);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;">
+            <span style="color:oklch(0.72 0.17 240);">Resultado oficial</span>
+            <span style="color:#9aa6b2;">Loteria Federal · {{ res.concursoLabel }}</span>
+          </div>
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div style="display:flex;flex-direction:column;gap:2px;">
+              <span style="font-size:12px;color:#9aa6b2;font-weight:700;">Número contemplado</span>
+              <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:40px;font-weight:700;line-height:1;">{{ res.winnerNumber }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+              <span style="font-size:20px;font-weight:700;">{{ res.shortName }}</span>
+              <span style="font-size:12px;color:#9aa6b2;">1º prêmio: <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;color:#f2f5f7;">{{ res.p1 }}</span></span>
+            </div>
+          </div>
+          <sc-if value="{{ res.hasNote }}"><span style="font-size:12px;color:#9aa6b2;">{{ res.note }}</span></sc-if>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{ rankingOn }}">
+        <section style="background:linear-gradient(165deg,#0f3a6b 0%,#0b2b52 55%,#0a2142 100%);border:1px solid #245a96;border-radius:22px;padding:22px 20px;box-shadow:0 18px 40px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;">
+            <span style="color:oklch(0.72 0.17 240);">Ranking em tempo real</span>
+            <span style="display:flex;align-items:center;gap:6px;color:#f2f5f7;"><span style="width:8px;height:8px;border-radius:50%;background:oklch(0.7 0.18 25);animation:xcpulse 1.4s infinite;"></span>Ao vivo</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <h2 style="margin:0;font-size:30px;line-height:1.1;font-weight:700;letter-spacing:-0.02em;text-wrap:balance;">{{ c.rankingText }}</h2>
+            <span style="font-size:14px;color:#9aa6b2;">{{ rankingSub }}</span>
+          </div>
+          <div style="border:1px solid oklch(0.86 0.13 88);background:rgba(0,0,0,.18);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;transition:transform .2s ease,box-shadow .2s ease;" style-hover="transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.4);">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:oklch(0.86 0.13 88);">🏆 {{ rankModeLabel }}</span>
+              <span style="font-size:11px;font-weight:700;background:oklch(0.86 0.13 88);color:#2a2208;border-radius:999px;padding:4px 10px;">Líder</span>
+            </div>
+            <div style="background:linear-gradient(90deg,#fffdf6,#fbf0d2);color:#0b2b52;border-radius:12px;padding:12px;text-align:center;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:32px;font-weight:700;letter-spacing:.14em;">{{ rankLeader.number }}</div>
+            <div style="display:flex;justify-content:space-between;gap:10px;font-size:13px;"><span style="font-weight:800;font-size:15px;">{{ rankLeader.name }}</span><span style="color:#9aa6b2;">{{ rankLeader.when }}</span></div>
+          </div>
+          <sc-for list="{{ rankRest }}" as="r">
+            <div style="display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.2);border-radius:12px;padding:10px 12px;transition:transform .18s ease;" style-hover="transform:translateX(3px);">
+              <span style="font-weight:800;font-size:14px;width:28px;color:#9aa6b2;">{{ r.pos }}</span>
+              <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-weight:700;font-size:16px;">{{ r.number }}</span>
+              <span style="flex:1;text-align:right;font-size:13px;color:#9aa6b2;">{{ r.name }} · {{ r.when }}</span>
+            </div>
+          </sc-for>
+          <span style="font-size:12px;color:#7a8692;">Atualiza a cada pagamento confirmado</span>
+        </section>
+      </sc-if>
+
+      <section style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <h2 style="margin:0;font-size:18px;font-weight:700;">Promoção</h2>
+          <span style="font-size:13px;color:#9aa6b2;">Quanto mais títulos, menor o valor</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;">
+          <sc-for list="{{ combos }}" as="cb" hint-placeholder-count="3">
+            <button onClick="{{ cb.onClick }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;position:relative;text-align:left;background:#26303b;border:2px solid {{ cb.border }};border-radius:14px;padding:14px 12px;color:#f2f5f7;cursor:pointer;display:flex;flex-direction:column;gap:4px;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">
+              <span style="font-size:26px;font-weight:800;line-height:1;">{{ cb.qty }}</span>
+              <span style="font-size:12px;color:#9aa6b2;font-weight:600;">títulos</span>
+              <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:15px;font-weight:700;color:oklch(0.72 0.17 240);">{{ cb.price }}</span>
+              <span style="margin-top:8px;text-align:center;border-radius:10px;padding:8px;background:rgba(30,150,240,.12);border:1px solid rgba(30,150,240,.35);color:oklch(0.72 0.17 240);font-size:12px;font-weight:700;">Escolher este combo</span>
+              <sc-if value="{{ cb.hasOff }}">
+                <span style="position:absolute;top:10px;right:10px;font-size:11px;font-weight:800;background:oklch(0.8 0.15 150);color:#0d1a10;border-radius:6px;padding:3px 6px;">{{ cb.off }}</span>
+              </sc-if>
+            </button>
+          </sc-for>
+        </div>
+      </section>
+
+      <section style="background:#26303b;border:1px solid #34404d;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+          <sc-for list="{{ quick }}" as="q" hint-placeholder-count="6">
+            <button onClick="{{ q.onClick }}" style="display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;background:#2e3946;border:1px solid #3d4a58;border-radius:16px;padding:12px 0;color:#f2f5f7;cursor:pointer;"  style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);"><span style="font-size:18px;font-weight:800;">{{ q.label }}</span><span style="font-size:11px;font-weight:600;color:#9aa6b2;">Selecionar</span></button>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button onClick="{{ qtyMinus }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;width:52px;height:52px;flex:none;border-radius:14px;border:1px solid #3d4a58;background:#2e3946;color:#f2f5f7;font-size:22px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">−</button>
+          <input value="{{ qty }}" onChange="{{ setQty }}" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1;min-width:0;height:52px;text-align:center;background:#1e2630;border:1px solid #3d4a58;border-radius:12px;color:#f2f5f7;font-size:22px;font-weight:800;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+          <button onClick="{{ qtyPlus }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;width:52px;height:52px;flex:none;border-radius:14px;border:1px solid #3d4a58;background:#2e3946;color:#f2f5f7;font-size:22px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">+</button>
+          <button onClick="{{ qtyClear }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;height:52px;flex:none;border-radius:14px;border:1px solid #3d4a58;background:transparent;color:#9aa6b2;font-size:13px;font-weight:700;padding:0 12px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Limpar</button>
+        </div>
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
+          <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;color:#9aa6b2;">
+            <span>{{ unitLabel }}</span>
+            <sc-if value="{{ hasSpinsEarn }}"><span style="color:oklch(0.8 0.15 150);font-weight:700;">+{{ spinsEarn }} giro(s) na roleta</span></sc-if>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;">
+            <span style="font-size:12px;color:#9aa6b2;font-weight:600;">Total</span>
+            <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:26px;font-weight:700;">{{ totalLabel }}</span>
+          </div>
+        </div>
+        <button onClick="{{ openCheckout }}" disabled="{{ ended }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;width:100%;border:none;border-radius:14px;padding:18px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-size:17px;font-weight:700;letter-spacing:.02em;cursor:pointer;" style-active="transform:scale(.98);" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);">{{ buyLabel }}</button>
+        <span style="text-align:center;font-size:12px;color:#9aa6b2;">Pagamento via PIX · números aleatórios gerados após a confirmação</span>
+      </section>
+
+      <section style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;">
+          <h2 style="margin:0;font-size:18px;font-weight:700;">Títulos premiados</h2>
+          <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:14px;color:#9aa6b2;">{{ prizesOutLabel }}</span>
+        </div>
+        <span style="font-size:13px;color:#9aa6b2;margin-top:-4px;">Se um desses números sair na sua compra, o prêmio é seu na hora.</span>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <sc-for list="{{ prizeList }}" as="p" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:12px;background:#26303b;border:1px solid #34404d;border-radius:12px;padding:12px 14px;transition:transform .18s ease,border-color .18s ease;" style-hover="transform:translateX(3px);border-color:#4a5866;">
+              <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-weight:700;font-size:15px;color:{{ p.numColor }};">{{ p.number }}</span>
+              <span style="flex:1;font-weight:700;font-size:14px;">{{ p.prize }}</span>
+              <span style="font-size:12px;font-weight:700;text-align:right;color:{{ p.statusColor }};">{{ p.status }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+      <section style="display:flex;flex-direction:column;gap:12px;">
+        <h2 style="margin:0;font-size:20px;font-weight:700;">Como funciona</h2>
+        <div style="display:flex;flex-direction:column;gap:1px;background:#34404d;border:1px solid #34404d;border-radius:16px;overflow:hidden;">
+          <sc-for list="{{ steps }}" as="sp" hint-placeholder-count="3">
+            <div style="display:flex;gap:14px;align-items:flex-start;background:#26303b;padding:14px 16px;">
+              <span style="flex:none;width:30px;height:30px;border-radius:50%;border:1px solid oklch(0.72 0.17 240);color:oklch(0.72 0.17 240);display:flex;align-items:center;justify-content:center;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-weight:700;font-size:13px;">{{ sp.n }}</span>
+              <div style="display:flex;flex-direction:column;gap:3px;">
+                <span style="font-weight:800;font-size:15px;">{{ sp.title }}</span>
+                <span style="font-size:13px;color:#9aa6b2;line-height:1.5;text-wrap:pretty;">{{ sp.text }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <a href="https://loterias.caixa.gov.br/Paginas/Federal.aspx" target="_blank" style="font-size:13px;font-weight:700;">Consultar resultados da Loteria Federal na Caixa →</a>
+      </section>
+    </sc-if>
+    <sc-if value="{{ isLoading }}"><div style="padding:60px 0;text-align:center;color:#9aa6b2;font-size:14px;">Carregando…</div></sc-if>
+    <sc-if value="{{ noCamp }}">
+      <div style="padding:56px 8px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;">
+        <span style="font-size:24px;font-weight:700;">Nenhuma campanha ativa</span>
+        <span style="font-size:14px;color:#9aa6b2;max-width:320px;line-height:1.5;">A próxima rifa será anunciada em breve. Fique de olho no nosso Instagram.</span>
+      </div>
+    </sc-if>
+    </sc-if>
+
+    <sc-if value="{{ isMeus }}">
+      <section style="display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <h1 style="margin:0;font-size:28px;font-weight:700;">Meus títulos</h1>
+          <span style="color:#9aa6b2;font-size:14px;">Digite o WhatsApp usado na compra.</span>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <input value="{{ search }}" onChange="{{ setSearch }}" onKeyDown="{{ searchKey }}" placeholder="(00) 00000-0000" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1;min-width:0;background:#26303b;border:1px solid #3d4a58;border-radius:12px;padding:14px;color:#f2f5f7;font-size:16px;outline:none;"  style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+          <button onClick="{{ doSearch }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;border-radius:14px;padding:0 18px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-weight:800;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">Buscar</button>
+        </div>
+        <sc-if value="{{ searchEmpty }}">
+          <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:18px;color:#9aa6b2;font-size:14px;">Nenhuma compra encontrada para esse número.</div>
+        </sc-if>
+        <sc-if value="{{ mySpinsShow }}">
+          <button onClick="{{ goRoletaMine }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;display:flex;justify-content:space-between;align-items:center;background:oklch(0.8 0.15 150);color:#0d1a10;border:none;border-radius:14px;padding:14px 16px;font-weight:800;font-size:15px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);"><span>Você tem {{ mySpins }} giro(s) na roleta</span><span>Girar →</span></button>
+        </sc-if>
+        <sc-for list="{{ myOrders }}" as="o">
+          <div style="background:#26303b;border:1px solid #34404d;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <span style="font-weight:800;font-size:15px;">{{ o.qty }} títulos · {{ o.total }}</span>
+                <span style="font-size:12px;color:#9aa6b2;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;">{{ o.id }} · {{ o.date }}</span>
+              </div>
+              <span style="font-size:12px;font-weight:800;padding:5px 9px;border-radius:8px;background:{{ o.stBg }};color:{{ o.stFg }};">{{ o.status }}</span>
+            </div>
+            <sc-if value="{{ o.isPaid }}">
+              <div style="display:flex;flex-wrap:wrap;gap:5px;max-height:220px;overflow:auto;">
+                <sc-for list="{{ o.chips }}" as="ch">
+                  <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:12px;font-weight:700;padding:4px 7px;border-radius:6px;background:{{ ch.bg }};color:{{ ch.fg }};">{{ ch.n }}</span>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ o.isPending }}">
+              <button onClick="{{ o.onPay }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;border-radius:14px;padding:12px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-weight:800;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">Pagar agora</button>
+            </sc-if>
+          </div>
+        </sc-for>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isRoleta }}">
+      <section style="display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <h1 style="margin:0;font-size:28px;font-weight:700;">Roleta da sorte</h1>
+          <span style="color:#9aa6b2;font-size:14px;">{{ wheelRule }}</span>
+          <sc-if value="{{ wheelEmpty }}"><div style="margin-top:8px;background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;font-size:14px;color:#c9d1d9;">A roleta ainda não foi configurada para esta campanha.</div></sc-if>
+        </div>
+        <div style="position:relative;width:min(300px,80vw);aspect-ratio:1/1;margin:8px auto;">
+          <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:26px solid #f2f5f7;z-index:3;"></div>
+          <div style="width:100%;height:100%;border-radius:50%;border:6px solid #34404d;background:{{ wheelBg }};transform:rotate({{ wDeg }}deg);transition:transform 4.3s cubic-bezier(.15,.7,.15,1);position:relative;overflow:hidden;">
+            <sc-for list="{{ wheelLabels }}" as="w">
+              <div style="position:absolute;inset:0;transform:rotate({{ w.angle }}deg);display:flex;justify-content:center;pointer-events:none;">
+                <span style="writing-mode:vertical-rl;padding-top:14px;max-height:38%;overflow:hidden;font-size:12px;font-weight:800;text-transform:uppercase;color:{{ w.fg }};">{{ w.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="position:absolute;top:50%;left:50%;width:54px;height:54px;transform:translate(-50%,-50%);border-radius:50%;background:#1e2630;border:4px solid #f2f5f7;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">XC</div>
+        </div>
+        <sc-if value="{{ wNotLogged }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;gap:8px;">
+            <input value="{{ wInput }}" onChange="{{ setWInput }}" placeholder="Seu WhatsApp" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1;min-width:0;background:#26303b;border:1px solid #3d4a58;border-radius:12px;padding:14px;color:#f2f5f7;font-size:16px;outline:none;"  style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+            <button onClick="{{ wLogin }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;border-radius:14px;padding:0 18px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-weight:800;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">Entrar</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ wLogged }}">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;gap:10px;">
+            <span style="color:#9aa6b2;">{{ wPhoneLabel }} · <a href="#" onClick="{{ wLogout }}">trocar</a></span>
+            <span style="font-weight:800;">Giros: <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;color:oklch(0.72 0.17 240);font-size:18px;">{{ spinsLeft }}</span></span>
+          </div>
+          <button onClick="{{ spin }}" disabled="{{ spinDisabled }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;width:100%;border:none;border-radius:14px;padding:18px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-size:17px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">{{ spinLabel }}</button>
+          <sc-if value="{{ hasResult }}">
+            <div style="text-align:center;border-radius:14px;padding:16px;background:{{ resultBg }};color:{{ resultFg }};font-weight:800;font-size:18px;">{{ resultText }}</div>
+          </sc-if>
+          <sc-if value="{{ hasMyWins }}">
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <span style="font-size:13px;color:#9aa6b2;font-weight:700;text-transform:uppercase;letter-spacing:.04em;">Seus prêmios na roleta</span>
+              <sc-for list="{{ myWins }}" as="mw">
+                <div style="display:flex;justify-content:space-between;background:#26303b;border:1px solid #34404d;border-radius:10px;padding:10px 12px;font-size:14px;"><span style="font-weight:700;">{{ mw.label }}</span><span style="color:#9aa6b2;">{{ mw.when }}</span></div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isGanhadores }}">
+      <section style="display:flex;flex-direction:column;gap:14px;">
+        <h1 style="margin:0;font-size:28px;font-weight:700;">Ganhadores</h1>
+        <sc-if value="{{ noWinners }}"><span style="color:#9aa6b2;">Ainda não temos ganhadores nesta edição.</span></sc-if>
+        <sc-for list="{{ winners }}" as="w">
+          <div style="display:flex;align-items:center;gap:12px;background:#26303b;border:1px solid #34404d;border-radius:14px;padding:14px;transition:transform .18s ease,border-color .18s ease;" style-hover="transform:translateY(-2px);border-color:#4a5866;">
+            <div style="width:44px;height:44px;flex:none;border-radius:50%;background:#2e3946;display:flex;align-items:center;justify-content:center;font-weight:800;color:oklch(0.72 0.17 240);">{{ w.initial }}</div>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;">
+              <span style="font-weight:800;font-size:15px;">{{ w.name }}</span>
+              <span style="font-size:13px;color:#9aa6b2;">{{ w.prize }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+              <span style="font-size:11px;font-weight:800;text-transform:uppercase;color:{{ w.typeColor }};">{{ w.type }}</span>
+              <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:13px;font-weight:700;">{{ w.number }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </section>
+    </sc-if>
+  </main>
+
+  <sc-if value="{{ showSticky }}">
+    <div style="position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(30,38,48,.96);backdrop-filter:blur(10px);border-top:1px solid #34404d;">
+      <div style="max-width:560px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px;">
+        <div style="flex:1;display:flex;flex-direction:column;">
+          <span style="font-size:12px;color:#9aa6b2;font-weight:700;">{{ qty }} títulos</span>
+          <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:20px;font-weight:700;">{{ totalLabel }}</span>
+        </div>
+        <button onClick="{{ openCheckout }}" disabled="{{ ended }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;border-radius:14px;padding:15px 22px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-size:15px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">{{ buyLabel }}</button>
+      </div>
+    </div>
+  </sc-if>
+  <footer style="border-top:1px solid #34404d;margin-top:24px;">
+    <div style="max-width:560px;margin:0 auto;padding:24px 16px 110px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;">
+      <p style="margin:0;font-size:12px;line-height:1.6;color:#9aa6b2;text-wrap:pretty;">Este título está autorizado com base no termo de autorização descrito no regulamento da promoção. Antes de participar, consulte o regulamento. É proibida a venda para menores de 18 anos. Os sorteios e a entrega dos prêmios serão realizados de acordo com os critérios estabelecidos neste site. O participante concorrerá em todos os sorteios previstos no título digital emitido, mesmo sendo contemplado em algum deles. Ao participar, o titular concorda desde já e sem ônus com a utilização de seu nome, voz e imagem para a divulgação desta campanha. Confira o resultado dos sorteios e as condições de participação em <a href="#">xandecortes.com.br/termos-de-uso</a>.</p>
+      <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#9aa6b2;"><span style="border:1px solid #9aa6b2;border-radius:6px;padding:2px 6px;font-weight:800;font-size:12px;">18+</span><span>2026 Xande Cortes © Todos os direitos reservados.</span></div>
+      <sc-if value="{{ appShow }}">
+        <div style="position:relative;width:100%;background:#2b4a6b;border:1px solid #3a5d82;border-radius:18px;padding:16px 46px 16px 18px;display:flex;align-items:center;gap:14px;text-align:left;transition:transform .18s ease,box-shadow .18s ease;" style-hover="transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.35);">
+          <button onClick="{{ appDismiss }}" aria-label="Fechar" style="position:absolute;top:6px;right:8px;width:28px;height:28px;border:none;background:transparent;color:#c9d1d9;font-size:14px;cursor:pointer;">✕</button>
+          <div style="width:64px;height:64px;flex:none;border-radius:16px;background:#0f1419;display:flex;align-items:center;justify-content:center;padding:6px;"><img src="logo-xande-cortes.png" alt="Xande Cortes" style="width:100%;height:auto;display:block;"></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;">
+            <span style="font-size:17px;font-weight:700;color:#f2f5f7;">Instale nosso app grátis</span>
+            <span style="font-size:13px;color:#c9d1d9;">Receba promoções exclusivas!</span>
+          </div>
+          <button onClick="{{ installApp }}" aria-label="Instalar app" style="width:48px;height:48px;flex:none;border:none;border-radius:14px;background:#f2f5f7;color:#2b4a6b;font-size:22px;font-weight:700;cursor:pointer;transition:transform .18s ease;" style-hover="transform:translateX(3px) scale(1.05);" style-active="transform:scale(.94);">→</button>
+        </div>
+      </sc-if>
+    </div>
+  </footer>
+
+  <sc-if value="{{ installHelp }}">
+    <div onClick="{{ closeInstallHelp }}" style="position:fixed;inset:0;z-index:55;background:rgba(0,0,0,.7);display:flex;align-items:flex-end;justify-content:center;padding:12px;">
+      <div onClick="{{ stop }}" style="width:100%;max-width:440px;background:#26303b;border:1px solid #34404d;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:19px;font-weight:700;">Instalar o app</span><button onClick="{{ closeInstallHelp }}" style="border:none;background:transparent;color:#9aa6b2;font-size:18px;cursor:pointer;">✕</button></div>
+        <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.5;color:#c9d1d9;">
+          <div style="background:#1e2630;border-radius:12px;padding:12px 14px;"><b style="color:#f2f5f7;">iPhone (Safari):</b> toque em Compartilhar e depois em "Adicionar à Tela de Início".</div>
+          <div style="background:#1e2630;border-radius:12px;padding:12px 14px;"><b style="color:#f2f5f7;">Android (Chrome):</b> toque no menu ⋮ e depois em "Instalar app" ou "Adicionar à tela inicial".</div>
+        </div>
+        <button onClick="{{ closeInstallHelp }}" style="border:none;border-radius:14px;padding:14px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-weight:800;cursor:pointer;">Entendi</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isAdmin }}">
+<div style="min-height:100vh;background:#192029;">
+  <header style="border-bottom:1px solid #34404d;background:#1e2630;">
+    <div style="max-width:1100px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:baseline;gap:6px;font-weight:800;font-size:20px;text-transform:uppercase;"><img src="logo-xande-cortes.png" alt="Xande Cortes" style="height:40px;width:auto;display:block;align-self:center;"><span style="font-size:12px;color:#9aa6b2;font-weight:700;margin-left:6px;">Painel admin</span></div>
+      <div style="display:flex;gap:8px;">
+        <button onClick="{{ goHome }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:transparent;color:#f2f5f7;border-radius:14px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Ver site</button>
+        <sc-if value="{{ adm }}"><button onClick="{{ logout }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:transparent;color:#9aa6b2;border-radius:14px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Sair</button></sc-if>
+      </div>
+    </div>
+  </header>
+
+  <sc-if value="{{ notAdm }}" hint-placeholder-val="{{ true }}">
+    <div style="max-width:380px;margin:80px auto;padding:0 16px;">
+      <div style="background:#26303b;border:1px solid #34404d;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:14px;">
+        <h1 style="margin:0;font-size:22px;font-weight:700;">Entrar no painel</h1>
+        <input type="email" value="{{ email }}" onChange="{{ setEmail }}" onKeyDown="{{ passKey }}" placeholder="E-mail" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:12px;padding:14px;color:#f2f5f7;font-size:16px;outline:none;"  style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+        <input type="password" value="{{ pass }}" onChange="{{ setPass }}" onKeyDown="{{ passKey }}" placeholder="Senha" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:12px;padding:14px;color:#f2f5f7;font-size:16px;outline:none;"  style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+        <sc-if value="{{ passErr }}"><span style="color:oklch(0.75 0.16 25);font-size:13px;font-weight:700;">{{ passErr }}</span></sc-if>
+        <button onClick="{{ login }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;border-radius:14px;padding:14px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-weight:800;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">{{ loginLabel }}</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ adm }}">
+    <div style="max-width:1100px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px;">
+      <sc-if value="{{ aLoading }}"><div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;color:#9aa6b2;font-size:14px;">Carregando dados…</div></sc-if>
+      <sc-if value="{{ noCampAdm }}">
+        <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;padding:28px 22px;display:flex;flex-direction:column;align-items:flex-start;gap:12px;">
+          <span style="font-size:22px;font-weight:700;">Nenhuma rifa criada ainda</span>
+          <span style="font-size:14px;color:#9aa6b2;line-height:1.5;">Crie sua primeira rifa e depois configure título, fotos, valor de cada cota, total de cotas, combos, cotas premiadas e roleta.</span>
+          <button onClick="{{ createCampaign }}" style="border:none;border-radius:14px;padding:14px 20px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;transition:transform .18s ease,filter .18s ease;" style-hover="transform:translateY(-2px);filter:brightness(1.08);">Criar primeira rifa</button>
+        </div>
+      </sc-if>
+      <nav style="display:flex;gap:6px;overflow-x:auto;">
+        <sc-for list="{{ tabs }}" as="t">
+          <button onClick="{{ t.onClick }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;flex:none;border:1px solid #3d4a58;background:{{ t.bg }};color:{{ t.fg }};border-radius:14px;padding:9px 14px;font-weight:700;font-size:13px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">{{ t.label }}</button>
+        </sc-for>
+      </nav>
+
+      <sc-if value="{{ tGeral }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:20px;font-weight:700;">{{ c.title }}</span><span style="font-size:12px;color:#9aa6b2;">{{ lastSyncLabel }}</span></div>
+          <button onClick="{{ refresh }}" style="border:1px solid #3d4a58;background:transparent;color:#f2f5f7;border-radius:14px;padding:10px 14px;font-weight:700;font-size:13px;cursor:pointer;transition:transform .18s ease,border-color .18s ease;" style-hover="transform:translateY(-2px);border-color:oklch(0.72 0.17 240);">Atualizar</button>
+        </div>
+        <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:700;"><span>Progresso de vendas</span><span style="color:#9aa6b2;">{{ soldLabel }} de {{ totalLabelAdm }} cotas · {{ pctLabel }}</span></div>
+          <div style="height:10px;background:#2e3946;border-radius:999px;overflow:hidden;"><div style="height:100%;width:{{ pctStr }}%;background:oklch(0.72 0.17 240);border-radius:999px;transition:width .6s ease;"></div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">
+          <sc-for list="{{ stats }}" as="st" hint-placeholder-count="6">
+            <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:4px;transition:transform .18s ease,border-color .18s ease;" style-hover="transform:translateY(-2px);border-color:#4a5866;">
+              <span style="font-size:12px;color:#9aa6b2;font-weight:700;">{{ st.label }}</span>
+              <span style="font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;color:{{ st.color }};">{{ st.value }}</span>
+              <span style="font-size:12px;color:#9aa6b2;">{{ st.sub }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;"><span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Faturamento por dia</span><span style="font-size:12px;color:#9aa6b2;">Últimos 14 dias</span></div>
+          <div style="display:flex;align-items:flex-end;gap:4px;height:160px;">
+            <sc-for list="{{ salesDays }}" as="sd" hint-placeholder-count="14">
+              <div title="{{ sd.tip }}" style="flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;">
+                <div style="width:100%;max-width:28px;height:{{ sd.h }}%;min-height:3px;background:{{ sd.bg }};border-radius:6px 6px 2px 2px;transition:height .5s ease,filter .18s ease;" style-hover="filter:brightness(1.25);"></div>
+                <span style="font-size:10px;color:#7a8692;white-space:nowrap;">{{ sd.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <span style="font-size:12px;color:#9aa6b2;">Melhor dia: {{ bestDay }}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:16px;align-items:start;">
+          <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;">
+            <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Top clientes</span>
+            <sc-if value="{{ noTop }}"><span style="font-size:14px;color:#9aa6b2;">Nenhuma venda paga ainda.</span></sc-if>
+            <sc-for list="{{ topClients }}" as="tc">
+              <div style="display:flex;align-items:center;gap:12px;border-top:1px solid #34404d;padding-top:10px;">
+                <span style="width:26px;height:26px;flex:none;border-radius:50%;background:{{ tc.badge }};color:{{ tc.badgeFg }};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;">{{ tc.pos }}</span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;"><span style="font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ tc.name }}</span><span style="font-size:12px;color:#9aa6b2;">{{ tc.phone }} · {{ tc.orders }} pedido(s)</span></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;"><span style="font-weight:800;font-size:14px;font-variant-numeric:tabular-nums;">{{ tc.cotas }} cotas</span><span style="font-size:12px;color:oklch(0.8 0.15 150);">{{ tc.total }}</span></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Tamanho das compras</span>
+              <sc-for list="{{ buckets }}" as="bk">
+                <div style="display:flex;flex-direction:column;gap:5px;">
+                  <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="font-weight:600;">{{ bk.label }}</span><span style="color:#9aa6b2;">{{ bk.count }} pedidos · {{ bk.pct }}</span></div>
+                  <div style="height:8px;background:#2e3946;border-radius:999px;overflow:hidden;"><div style="height:100%;width:{{ bk.w }}%;background:oklch(0.72 0.17 240);border-radius:999px;transition:width .5s ease;"></div></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Últimos pedidos</span>
+              <sc-if value="{{ noOrders }}"><span style="font-size:14px;color:#9aa6b2;">Nenhum pedido ainda.</span></sc-if>
+              <sc-for list="{{ recentOrders }}" as="o">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid #34404d;padding-top:10px;font-size:14px;">
+                  <span style="font-weight:700;flex:1;min-width:120px;">{{ o.name }}</span>
+                  <span style="color:#9aa6b2;">{{ o.qty }} cotas</span>
+                  <span style="font-variant-numeric:tabular-nums;">{{ o.total }}</span>
+                  <span style="font-size:12px;font-weight:800;padding:4px 8px;border-radius:7px;background:{{ o.stBg }};color:{{ o.stFg }};">{{ o.status }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tCampanha }}">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span style="font-size:13px;color:#9aa6b2;">Status: <b style="color:#f2f5f7;">{{ statusLabel }}</b></span>
+          <button onClick="{{ createCampaign }}" style="border:1px solid #3d4a58;background:transparent;color:#f2f5f7;border-radius:14px;padding:10px 14px;font-weight:700;font-size:13px;cursor:pointer;transition:transform .18s ease,border-color .18s ease;" style-hover="transform:translateY(-2px);border-color:oklch(0.72 0.17 240);">+ Criar nova rifa</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:16px;align-items:start;">
+          <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;">
+            <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Dados da campanha</span>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Título<input value="{{ c.title }}" onChange="{{ f.title }}" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Descrição<textarea value="{{ c.desc }}" onChange="{{ f.desc }}" rows="3" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;resize:vertical;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></textarea></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Valor de cada cota (R$)<input value="{{ c.price }}" onChange="{{ f.price }}" inputMode="decimal" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Total de cotas (vagas)<input value="{{ c.total }}" onChange="{{ f.total }}" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Compra mínima<input value="{{ c.minQty }}" onChange="{{ f.minQty }}" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">1 giro a cada X títulos<input value="{{ c.spinsEvery }}" onChange="{{ f.spinsEvery }}" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+            </div>
+            <div style="background:#1e2630;border:1px solid #34404d;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.5;color:#c9d1d9;">
+              <span style="font-weight:700;color:#f2f5f7;">Encerramento automático</span>
+              <span>A campanha só encerra quando todas as cotas forem vendidas. Vendidas: {{ soldLabel }} de {{ totalLabelAdm }}.</span>
+            </div>
+            <div style="background:#1e2630;border:1px solid #34404d;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.5;color:#c9d1d9;">
+              <span style="font-weight:700;color:#f2f5f7;">Como funcionam os números</span>
+              <span>{{ numHelp }}</span>
+            </div>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Forma de sorteio<input value="{{ c.drawInfo }}" onChange="{{ f.drawInfo }}" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Fotos (uma URL por linha)<textarea value="{{ c.imagesRaw }}" onChange="{{ f.imagesRaw }}" rows="3" placeholder="https://…" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:13px;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;outline:none;resize:vertical;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></textarea></label>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Combos promocionais</span>
+              <sc-for list="{{ comboRows }}" as="r">
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <input value="{{ r.qty }}" onChange="{{ r.onQty }}" placeholder="Qtd" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1;min-width:0;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:10px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+                  <span style="color:#9aa6b2;font-size:13px;">por R$</span>
+                  <input value="{{ r.price }}" onChange="{{ r.onPrice }}" placeholder="Valor" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1;min-width:0;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:10px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+                  <button onClick="{{ r.onRemove }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:transparent;color:#9aa6b2;border-radius:14px;width:40px;height:40px;flex:none;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">✕</button>
+                </div>
+              </sc-for>
+              <button onClick="{{ addCombo }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px dashed #3d4a58;background:transparent;color:#f2f5f7;border-radius:14px;padding:10px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">+ Adicionar combo</button>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Botões rápidos (separados por vírgula)<input value="{{ c.quickRaw }}" onChange="{{ f.quickRaw }}" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+            </div>
+            <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Ranking ao vivo</span>
+              <label style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;"><input type="checkbox" checked="{{ c.rankingOn }}" onChange="{{ setRankingOn }}" style="width:18px;height:18px;accent-color:oklch(0.72 0.17 240);">Mostrar ranking na campanha</label>
+              <select value="{{ c.rankingMode }}" onChange="{{ f.rankingMode }}" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"><option value="menor">Menor título</option><option value="maior">Maior título</option></select>
+              <input value="{{ c.rankingText }}" onChange="{{ f.rankingText }}" placeholder="Texto do prêmio" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tCotas }}">
+        <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;">
+          <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Nova cota premiada</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <input value="{{ newPN.number }}" onChange="{{ setPNNumber }}" placeholder="Número" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;width:140px;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+            <button onClick="{{ randPN }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:transparent;color:#f2f5f7;border-radius:14px;padding:0 12px;font-weight:700;font-size:13px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Aleatório</button>
+            <input value="{{ newPN.prize }}" onChange="{{ setPNPrize }}" placeholder="Prêmio (ex: R$ 500 no PIX)" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1;min-width:200px;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+            <button onClick="{{ addPN }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;border-radius:14px;padding:0 16px;font-weight:800;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">Adicionar</button>
+          </div>
+          <span style="font-size:12px;color:#9aa6b2;">Quem receber esse número numa compra paga ganha o prêmio na hora. Faixa válida: {{ rangeLabel }}.</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <sc-for list="{{ pnRows }}" as="p">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#26303b;border:1px solid #34404d;border-radius:12px;padding:10px 12px;">
+              <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-weight:700;width:90px;">{{ p.number }}</span>
+              <input value="{{ p.prize }}" onChange="{{ p.onPrize }}" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1;min-width:160px;background:#1e2630;border:1px solid #3d4a58;border-radius:8px;padding:8px 10px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+              <span style="font-size:13px;font-weight:700;color:{{ p.statusColor }};min-width:160px;">{{ p.status }}</span>
+              <button onClick="{{ p.onRemove }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:transparent;color:#9aa6b2;border-radius:8px;width:36px;height:36px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">✕</button>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tRoleta }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:16px;align-items:start;">
+          <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;">
+            <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Prêmios da roleta</span>
+            <div style="display:flex;gap:8px;font-size:11px;color:#9aa6b2;font-weight:700;text-transform:uppercase;"><span style="width:10px;"></span><span style="flex:1;">Prêmio</span><span style="width:64px;">Peso</span><span style="width:52px;">Chance</span><span style="width:44px;text-align:center;">Perde</span><span style="width:36px;"></span></div>
+            <sc-for list="{{ wheelRows }}" as="r">
+              <div style="display:flex;gap:8px;align-items:center;">
+                <span style="width:10px;height:10px;border-radius:3px;flex:none;background:{{ r.swatch }};border:1px solid #3d4a58;"></span>
+                <input value="{{ r.label }}" onChange="{{ r.onLabel }}" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1;min-width:0;background:#1e2630;border:1px solid #3d4a58;border-radius:8px;padding:9px 10px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+                <input value="{{ r.weight }}" onChange="{{ r.onWeight }}" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;width:64px;background:#1e2630;border:1px solid #3d4a58;border-radius:8px;padding:9px 10px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+                <span style="width:52px;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:12px;color:#9aa6b2;">{{ r.prob }}</span>
+                <span style="width:44px;display:flex;justify-content:center;"><input type="checkbox" checked="{{ r.loss }}" onChange="{{ r.onLoss }}" style="width:18px;height:18px;accent-color:oklch(0.72 0.17 240);"></span>
+                <button onClick="{{ r.onRemove }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:transparent;color:#9aa6b2;border-radius:8px;width:36px;height:36px;flex:none;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">✕</button>
+              </div>
+            </sc-for>
+            <button onClick="{{ addWheel }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px dashed #3d4a58;background:transparent;color:#f2f5f7;border-radius:14px;padding:10px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">+ Adicionar prêmio</button>
+            <span style="font-size:12px;color:#9aa6b2;">Peso maior = mais chance. Marque "Perde" nas casas sem prêmio. O giro por títulos é definido na aba Campanha.</span>
+          </div>
+          <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px;">
+            <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Histórico de giros</span>
+            <sc-if value="{{ noSpinLog }}"><span style="font-size:14px;color:#9aa6b2;">Nenhum giro ainda.</span></sc-if>
+            <sc-for list="{{ spinLog }}" as="g">
+              <div style="display:flex;gap:10px;font-size:13px;border-top:1px solid #34404d;padding-top:8px;flex-wrap:wrap;">
+                <span style="flex:1;min-width:120px;font-weight:700;">{{ g.name }}</span>
+                <span style="color:{{ g.color }};font-weight:700;">{{ g.label }}</span>
+                <span style="color:#9aa6b2;">{{ g.when }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tPedidos }}">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <sc-for list="{{ orderFilters }}" as="of">
+            <button onClick="{{ of.onClick }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:{{ of.bg }};color:{{ of.fg }};border-radius:14px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">{{ of.label }}</button>
+          </sc-for>
+          <input value="{{ orderQ }}" onChange="{{ setOrderQ }}" placeholder="Buscar nome, telefone ou pedido" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1;min-width:200px;background:#26303b;border:1px solid #3d4a58;border-radius:10px;padding:10px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <sc-if value="{{ noOrders }}"><span style="color:#9aa6b2;font-size:14px;">Nenhum pedido.</span></sc-if>
+          <sc-for list="{{ orderRows }}" as="o">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#26303b;border:1px solid #34404d;border-radius:12px;padding:12px 14px;">
+              <div style="flex:1;min-width:180px;display:flex;flex-direction:column;gap:2px;">
+                <span style="font-weight:800;font-size:14px;">{{ o.name }}</span>
+                <span style="font-size:12px;color:#9aa6b2;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;">{{ o.id }} · {{ o.phone }} · {{ o.date }}</span>
+              </div>
+              <span style="font-size:14px;width:90px;">{{ o.qty }} tít.</span>
+              <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:14px;width:100px;">{{ o.total }}</span>
+              <span style="font-size:12px;font-weight:800;padding:4px 8px;border-radius:7px;background:{{ o.stBg }};color:{{ o.stFg }};">{{ o.status }}</span>
+              <div style="display:flex;gap:6px;">
+                <sc-if value="{{ o.isPending }}"><button onClick="{{ o.onConfirm }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;background:oklch(0.8 0.15 150);color:#0d1a10;border-radius:8px;padding:8px 10px;font-weight:800;font-size:12px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Confirmar pgto</button></sc-if>
+                <button onClick="{{ o.onDelete }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:transparent;color:#9aa6b2;border-radius:8px;padding:8px 10px;font-weight:700;font-size:12px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Excluir</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tSorteio }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:16px;align-items:start;">
+          <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;">
+            <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Apuração pela Loteria Federal</span>
+            <span style="font-size:13px;color:#9aa6b2;line-height:1.5;">{{ fedRule }}</span>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Concurso<input value="{{ fedForm.concurso }}" onChange="{{ fed.concurso }}" inputMode="numeric" placeholder="ex: 5890" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Data<input type="date" value="{{ fedForm.date }}" onChange="{{ fed.date }}" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;color-scheme:dark;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">1º prêmio<input value="{{ fedForm.p1 }}" onChange="{{ fed.p1 }}" inputMode="numeric" placeholder="5 dígitos" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">2º prêmio<input value="{{ fedForm.p2 }}" onChange="{{ fed.p2 }}" inputMode="numeric" placeholder="{{ p2Hint }}" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+            </div>
+            <button onClick="{{ apurar }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;border-radius:14px;padding:14px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-weight:800;font-size:15px;text-transform:uppercase;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">Apurar ganhador</button>
+            <a href="https://loterias.caixa.gov.br/Paginas/Federal.aspx" target="_blank" style="font-size:13px;font-weight:700;">Ver resultado oficial na Caixa →</a>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Resultado publicado</span>
+              <sc-if value="{{ noRes }}"><span style="font-size:14px;color:#9aa6b2;">Nenhum resultado apurado ainda.</span></sc-if>
+              <sc-if value="{{ hasRes }}">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                  <div style="background:#1e2630;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:11px;color:#9aa6b2;font-weight:700;text-transform:uppercase;">Número sorteado</span><span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:22px;font-weight:700;">{{ res.drawn }}</span></div>
+                  <div style="background:#1e2630;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:11px;color:#9aa6b2;font-weight:700;text-transform:uppercase;">Contemplado</span><span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:22px;font-weight:700;color:oklch(0.72 0.17 240);">{{ res.winnerNumber }}</span></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <span style="font-size:20px;font-weight:800;">{{ res.name }}</span>
+                  <span style="font-size:13px;color:#9aa6b2;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;">{{ res.phone }} · {{ res.orderId }} · {{ res.concursoLabel }}</span>
+                </div>
+                <sc-if value="{{ res.hasNote }}"><span style="font-size:12px;color:#9aa6b2;">{{ res.note }}</span></sc-if>
+                <button onClick="{{ clearRes }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #4a2a26;background:transparent;color:oklch(0.75 0.16 25);border-radius:14px;padding:10px;font-weight:700;font-size:13px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Apagar resultado</button>
+              </sc-if>
+            </div>
+            <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Conferir dono de um número</span>
+              <input value="{{ lookup }}" onChange="{{ setLookup }}" placeholder="Número" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;font-size:15px;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+              <sc-if value="{{ hasLookup }}"><span style="font-size:14px;font-weight:700;color:{{ lookupColor }};">{{ lookupResult }}</span></sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ showSave }}">
+  <div style="position:fixed;left:50%;bottom:16px;transform:translateX(-50%);width:calc(100% - 24px);max-width:560px;z-index:46;background:#0f1419;border:1px solid #3d4a58;border-radius:16px;padding:12px 12px 12px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 12px 32px rgba(0,0,0,.5);">
+    <span style="flex:1;font-size:14px;font-weight:700;">Alterações não salvas</span>
+    <button onClick="{{ discardChanges }}" style="border:1px solid #3d4a58;background:transparent;color:#9aa6b2;border-radius:12px;padding:10px 12px;font-weight:700;font-size:13px;cursor:pointer;">Descartar</button>
+    <button onClick="{{ saveCampaign }}" disabled="{{ saving }}" style="border:none;border-radius:12px;padding:10px 16px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));color:#ffffff;font-weight:800;font-size:14px;cursor:pointer;transition:transform .18s ease,filter .18s ease;" style-hover="transform:translateY(-2px);filter:brightness(1.08);">{{ saveLabel }}</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{ ageGate }}">
+  <div style="position:fixed;inset:0;z-index:80;background:rgba(10,9,8,.92);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px;">
+    <div style="width:100%;max-width:380px;background:#26303b;border:1px solid #34404d;border-radius:22px;padding:28px 22px 22px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;">
+      <div style="width:76px;height:76px;border-radius:50%;border:3px solid oklch(0.72 0.17 240);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:30px;color:oklch(0.72 0.17 240);">18+</div>
+      <sc-if value="{{ ageAsk }}" hint-placeholder-val="{{ true }}">
+        <h2 style="margin:0;font-size:28px;line-height:1;font-weight:700;">Você tem 18 anos ou mais?</h2>
+        <p style="margin:0;font-size:14px;color:#9aa6b2;line-height:1.5;">Este site é permitido apenas para maiores de idade. Ao entrar, você confirma ter 18 anos ou mais.</p>
+        <div style="width:100%;display:flex;flex-direction:column;gap:8px;">
+          <button onClick="{{ ageYes }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;border-radius:14px;padding:16px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-size:16px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">Sim, tenho 18 anos ou mais</button>
+          <button onClick="{{ ageNo }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;border-radius:14px;padding:14px;background:transparent;color:#f2f5f7;font-size:14px;font-weight:800;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Não tenho</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ ageBlocked }}">
+        <h2 style="margin:0;font-size:28px;line-height:1;font-weight:700;">Acesso não permitido</h2>
+        <p style="margin:0;font-size:14px;color:#9aa6b2;line-height:1.5;">A participação é exclusiva para maiores de 18 anos.</p>
+        <button onClick="{{ ageRetry }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;border-radius:14px;padding:12px 16px;background:transparent;color:#9aa6b2;font-size:13px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Voltar</button>
+      </sc-if>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ coOpen }}">
+  <div onClick="{{ closeCheckout }}" style="position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:12px;">
+    <div onClick="{{ stop }}" style="width:100%;max-width:440px;max-height:92vh;overflow:auto;background:#26303b;border:1px solid #34404d;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;"><h2 style="margin:0;font-size:20px;font-weight:700;">{{ coTitle }}</h2><button onClick="{{ closeCheckout }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;background:transparent;color:#9aa6b2;font-size:20px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">✕</button></div>
+
+      <sc-if value="{{ coForm }}">
+        <div style="display:flex;justify-content:space-between;background:#1e2630;border-radius:12px;padding:12px 14px;font-size:14px;"><span>{{ qty }} títulos</span><span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-weight:700;">{{ totalLabel }}</span></div>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Nome completo<input value="{{ form.name }}" onChange="{{ setFName }}" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:12px;padding:14px;color:#f2f5f7;font-size:16px;outline:none;"  style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">WhatsApp<input value="{{ form.phone }}" onChange="{{ setFPhone }}" inputMode="numeric" placeholder="(00) 00000-0000" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:12px;padding:14px;color:#f2f5f7;font-size:16px;outline:none;"  style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+        <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#9aa6b2;"><input type="checkbox" checked="{{ form.terms }}" onChange="{{ setFTerms }}" style="accent-color:oklch(0.72 0.17 240);margin-top:2px;">Tenho mais de 18 anos e aceito o regulamento.</label>
+        <sc-if value="{{ coErr }}"><span style="color:oklch(0.75 0.16 25);font-size:13px;font-weight:700;">{{ coErr }}</span></sc-if>
+        <button onClick="{{ genPix }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;border-radius:14px;padding:16px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-size:16px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">{{ genLabel }}</button>
+      </sc-if>
+
+      <sc-if value="{{ coPix }}">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;">
+          <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:26px;font-weight:700;color:oklch(0.72 0.17 240);">{{ coTotal }}</span>
+          <span style="font-size:13px;color:#9aa6b2;">expira em <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;color:#f2f5f7;font-weight:700;">{{ pixTimer }}</span></span>
+        </div>
+        <div style="width:210px;height:210px;margin:0 auto;border-radius:12px;background:#f2f5f7;padding:8px;display:flex;align-items:center;justify-content:center;">
+          <sc-if value="{{ hasQr }}"><img src="{{ qrSrc }}" alt="QR code PIX" style="width:100%;height:100%;image-rendering:pixelated;"></sc-if>
+          <sc-if value="{{ noQr }}"><span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:12px;color:#ffffff;">QR code PIX</span></sc-if>
+        </div>
+        <span style="font-size:13px;color:#9aa6b2;text-align:center;">Abra o app do banco, escolha PIX e escaneie o QR ou use o copia e cola.</span>
+        <div style="display:flex;gap:8px;">
+          <input readOnly="{{ true }}" value="{{ pixCode }}" style="flex:1;min-width:0;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#9aa6b2;font-size:12px;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;outline:none;">
+          <button onClick="{{ copyPix }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:#2e3946;color:#f2f5f7;border-radius:14px;padding:0 14px;font-weight:800;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Copiar</button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:700;color:{{ pixStatusColor }};"><span style="width:8px;height:8px;border-radius:50%;background:{{ pixStatusColor }};animation:xcpulse 1.4s infinite;"></span>{{ pixStatus }}</div>
+        <button onClick="{{ simulatePay }}" style="border:none;border-radius:14px;padding:16px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));color:#ffffff;font-size:15px;font-weight:800;cursor:pointer;transition:transform .18s ease,filter .18s ease;" style-hover="transform:translateY(-2px);filter:brightness(1.08);" style-active="transform:scale(.97);">Já paguei</button>
+        <span style="font-size:12px;color:#9aa6b2;">Pedido {{ coOrderId }} reservado. Você também pode pagar depois em Meus títulos.</span>
+      </sc-if>
+
+      <sc-if value="{{ coDone }}">
+        <sc-for list="{{ doneHits }}" as="h">
+          <div style="background:oklch(0.8 0.15 150);color:#0d1a10;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;">
+            <span style="font-size:12px;font-weight:800;text-transform:uppercase;">Cota premiada · {{ h.number }}</span>
+            <span style="font-size:20px;font-weight:800;">Você ganhou {{ h.prize }}!</span>
+          </div>
+        </sc-for>
+        <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Seus {{ doneQty }} números</span>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;max-height:240px;overflow:auto;">
+          <sc-for list="{{ doneChips }}" as="ch">
+            <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:12px;font-weight:700;padding:4px 7px;border-radius:6px;background:{{ ch.bg }};color:{{ ch.fg }};">{{ ch.n }}</span>
+          </sc-for>
+        </div>
+        <sc-if value="{{ doneHasSpins }}">
+          <button onClick="{{ goSpinFromDone }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;border-radius:14px;padding:16px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-size:16px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">Girar a roleta ({{ doneSpins }} giro/s)</button>
+        </sc-if>
+        <button onClick="{{ closeCheckout }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;border-radius:14px;padding:14px;background:transparent;color:#f2f5f7;font-weight:800;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Fechar</button>
+      </sc-if>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ cookieShow }}">
+  <div style="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);width:calc(100% - 24px);max-width:536px;z-index:45;background:#f2f5f7;color:#1e2630;border-radius:16px;padding:14px 14px 14px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 12px 32px rgba(0,0,0,.45);">
+    <div style="flex:1;display:flex;flex-direction:column;gap:2px;font-size:12px;line-height:1.45;color:#4a5866;">
+      <span style="font-size:13px;font-weight:800;color:#1e2630;">Aviso de cookies</span>
+      <span>Usamos cookies para melhorar a navegação e lembrar suas preferências. Saiba mais na Política de Privacidade.</span>
+    </div>
+    <button onClick="{{ acceptCookie }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;flex:none;border:none;border-radius:14px;padding:12px 16px;background:#1e2630;color:#f2f5f7;font-weight:800;font-size:13px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Ok, entendi</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{ hasToast }}">
+  <div style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60;background:#f2f5f7;color:#1e2630;font-weight:800;font-size:14px;padding:12px 18px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.4);">{{ toast }}</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  static SB_URL = 'https://witcarbhfyitbgxrwfrz.supabase.co';
+  static SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpdGNhcmJoZnlpdGJneHJ3ZnJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMjMyNTQsImV4cCI6MjEwNjg5OTI1NH0.Y8KVNLyCMhQWayRMHZ-aT47IdcvyMXO4z8GAJfj6e5E';
+  static num(s) { s = String(s ?? '').trim(); if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.'); return parseFloat(s) || 0; }
+  static int(s) { return parseInt(String(s ?? '').replace(/\D/g, ''), 10) || 0; }
+  static brl(v) { return (Number(v) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+  static digits(p) { return String(p || '').replace(/\D/g, ''); }
+  static fmtPhone(p) { const d = Component.digits(p); if (d.length < 10) return d; return `(${d.slice(0, 2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}`; }
+  static ago(ts, now) { if (!ts) return ''; const m = Math.max(0, Math.floor((now - ts) / 60000)); if (m < 1) return 'agora'; if (m < 60) return `há ${m}min`; const h = Math.floor(m / 60); if (h < 24) return `há ${h}h`; return `há ${Math.floor(h / 24)}d`; }
+  static date(ts) { return ts ? new Date(ts).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''; }
+  static shortName(n) { const p = String(n || '').trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length - 1][0]}.` : p[0] || '—'; }
+  static dec(v) { return String(v ?? '').replace('.', ','); }
+  static emptyC() { return { title: '', desc: '', price: '0', total: '0', minQty: '1', spinsEvery: '0', drawInfo: 'Resultado pela Loteria Federal', imagesRaw: '', combos: [], quickRaw: '', rankingOn: false, rankingMode: 'menor', rankingText: '', wheel: [] }; }
+  static toC(r) {
+    const C = Component;
+    return {
+      title: r.title || '', desc: r.description || '', price: C.dec(r.price), total: String(r.total), minQty: String(r.min_qty), spinsEvery: String(r.spins_every ?? 0),
+      drawInfo: r.draw_info || '', imagesRaw: (r.images || []).join('\n'),
+      combos: (r.combos || []).map(x => ({ qty: String(x.qty), price: C.dec(x.price) })), quickRaw: (r.quick || []).join(', '),
+      rankingOn: !!r.ranking_on, rankingMode: r.ranking_mode || 'menor', rankingText: r.ranking_text || '',
+      wheel: (r.wheel || []).map(w => ({ label: w.label, weight: String(w.weight), loss: !!w.loss }))
+    };
+  }
+  static fromC(c) {
+    const C = Component;
+    return {
+      title: c.title.trim(), description: c.desc, price: C.num(c.price), total: C.int(c.total), min_qty: Math.max(1, C.int(c.minQty)), spins_every: C.int(c.spinsEvery),
+      draw_info: c.drawInfo, images: String(c.imagesRaw || '').split('\n').map(x => x.trim()).filter(Boolean),
+      combos: c.combos.filter(x => C.int(x.qty) > 0 && C.num(x.price) > 0).map(x => ({ qty: C.int(x.qty), price: C.num(x.price) })),
+      quick: String(c.quickRaw || '').split(',').map(x => C.int(x)).filter(Boolean),
+      ranking_on: !!c.rankingOn, ranking_mode: c.rankingMode, ranking_text: c.rankingText,
+      wheel: c.wheel.filter(w => String(w.label).trim()).map(w => ({ label: String(w.label).trim(), weight: Math.max(0, C.num(w.weight)), loss: !!w.loss }))
+    };
+  }
+  static priceFor(qty, c) { const cb = (c.combos || []).find(x => Component.int(x.qty) === qty && Component.num(x.price) > 0); return cb ? Component.num(cb.price) : qty * Component.num(c.price); }
+
+  state = {
+    now: Date.now(), page: 'campanha', loading: true, campRow: null, camp: null, sold: 0, ranking: [], prizesOut: [], publicWins: [], prizeNumbers: [], pnOwners: {}, result: null,
+    imgIdx: 0, qty: 1, qtyTouched: false,
+    co: null, pix: {}, form: { name: '', phone: '', terms: false }, coErr: '', coBusy: false,
+    search: '', searched: '', myOrders: [], mySpins: 0,
+    wInput: '', wPhone: '', wDeg: 0, spinning: false, wResult: null, spinsLeft: 0, myWins: [],
+    adm: false, email: '', pass: '', passErr: '', authBusy: false, tab: 'geral', aLoading: false,
+    cEdit: null, dirty: false, saving: false, aOrders: [], aSpins: [], lastSync: 0,
+    newPN: { number: '', prize: '' }, orderF: 'todos', orderQ: '', lookup: '', lookupRes: null,
+    fedForm: { concurso: '', date: '', p1: '', p2: '' }, toast: '',
+    menu: false, dMode: null, installHelp: false, appHidden: localStorage.getItem('xc_app') === '0',
+    cookie: localStorage.getItem('xc_cookie') === '1', age: localStorage.getItem('xc_18') || ''
+  };
+
+  componentDidMount() {
+    const route = () => { if (location.hash === '#admin' || /\/admin\/?$/.test(location.pathname)) this.setState({ page: 'admin' }); };
+    route(); this._route = route; window.addEventListener('hashchange', route);
+    this._bip = e => { e.preventDefault(); this._dip = e; };
+    window.addEventListener('beforeinstallprompt', this._bip);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+    if (window.matchMedia && matchMedia('(display-mode: standalone)').matches) this.setState({ appHidden: true });
+    this._pnT = {};
+    const boot = () => {
+      if (!window.supabase) return (this._bootT = setTimeout(boot, 120));
+      this.sb = window.supabase.createClient(Component.SB_URL, Component.SB_KEY);
+      this.loadPublic();
+      this.sb.auth.getSession().then(({ data }) => { if (data && data.session) this.checkAdmin(); });
+    };
+    boot();
+    this._tick = setInterval(() => this.setState({ now: Date.now() }), 1000);
+    this._poll = setInterval(() => {
+      if (!this.sb || document.hidden) return;
+      if (this.state.page === 'admin') { if (this.state.adm && this.state.campRow) this.loadOrders(); }
+      else this.loadPublicStats();
+    }, 20000);
+  }
+  componentWillUnmount() { [this._tick, this._poll, this._payT].forEach(clearInterval); clearTimeout(this._bootT); window.removeEventListener('hashchange', this._route); window.removeEventListener('beforeinstallprompt', this._bip); }
+  toast(msg) { clearTimeout(this._toastT); this.setState({ toast: msg }); this._toastT = setTimeout(() => this.setState({ toast: '' }), 3000); }
+  err(e, fb) { this.toast((e && (e.message || e.error_description)) || fb || 'Algo deu errado. Tente novamente.'); }
+  go(page) { if (page !== 'admin' && location.hash) history.replaceState(null, '', location.pathname + location.search); window.scrollTo(0, 0); this.setState({ page }); }
+
+  async loadPublic() {
+    const { data, error } = await this.sb.from('campaigns').select('*').order('created_at', { ascending: false }).limit(1);
+    if (error) { this.setState({ loading: false }); return this.err(error, 'Não foi possível carregar a campanha'); }
+    const r = data && data[0];
+    if (!r) return this.setState({ loading: false, campRow: null, camp: null });
+    const firstQty = (r.combos && r.combos[0] && r.combos[0].qty) || r.min_qty || 1;
+    this.setState(s => ({ campRow: r, camp: Component.toC(r), qty: s.qtyTouched ? s.qty : firstQty, cEdit: s.dirty ? s.cEdit : Component.toC(r) }));
+    await Promise.all([this.loadPublicStats(r), this.loadPrizes(r.id), this.loadResult(r.id)]);
+    this.setState({ loading: false });
+  }
+  async loadPublicStats(r) {
+    r = r || this.state.campRow; if (!r) return;
+    const { data } = await this.sb.rpc('campaign_public', { p_campaign: r.id });
+    if (data) this.setState({ sold: data.sold || 0, ranking: data.ranking || [], prizesOut: data.prizes_out || [] });
+    const w = await this.sb.rpc('public_wins', { p_campaign: r.id });
+    if (!w.error) this.setState({ publicWins: w.data || [] });
+  }
+  async loadPrizes(id) { const { data } = await this.sb.from('prize_numbers').select('*').eq('campaign_id', id).order('number'); this.setState({ prizeNumbers: data || [] }); }
+  async loadResult(id) { const { data } = await this.sb.from('results').select('*').eq('campaign_id', id).maybeSingle(); this.setState({ result: data || null }); }
+
+  async genPix() {
+    const s = this.state, f = s.form, ph = Component.digits(f.phone);
+    if (f.name.trim().split(/\s+/).length < 2) return this.setState({ coErr: 'Informe nome e sobrenome' });
+    if (ph.length < 10) return this.setState({ coErr: 'WhatsApp inválido' });
+    if (!f.terms) return this.setState({ coErr: 'Aceite o regulamento para continuar' });
+    this.setState({ coBusy: true, coErr: '' });
+    const { data, error } = await this.sb.rpc('create_order', { p_campaign: s.campRow.id, p_name: f.name.trim(), p_phone: ph, p_qty: s.qty });
+    this.setState({ coBusy: false });
+    if (error) return this.setState({ coErr: error.message });
+    this.openPix(Array.isArray(data) ? data[0] : data);
+  }
+  openPix(o) { this.setState({ co: { step: 'pix', order: o }, pix: { loading: true } }); this.loadPix(o); clearInterval(this._payT); this._payT = setInterval(() => this.checkPay(o.id, true), 5000); }
+  async loadPix(o) {
+    try {
+      const { data, error } = await this.sb.functions.invoke('mp-pix', { body: { order_id: o.id } });
+      if (error || !data || !data.qr_code) throw error || new Error('sem qr');
+      this.setState({ pix: { code: data.qr_code, qr: data.qr_code_base64 } });
+    } catch (e) { this.setState({ pix: { err: true } }); }
+  }
+  async checkPay(id, silent) {
+    const { data } = await this.sb.rpc('order_status', { p_order: id });
+    if (data && data.status === 'paid') {
+      clearInterval(this._payT);
+      this.setState(s => ({ co: s.co ? { step: 'done', order: { ...s.co.order, status: 'paid' }, numbers: data.numbers || [] } : s.co }));
+      this.loadPublicStats();
+    } else if (!silent) this.toast('Ainda não identificamos o pagamento. Aguarde alguns segundos.');
+  }
+  async doSearch(raw) {
+    const ph = Component.digits(raw);
+    if (ph.length < 10) return this.toast('Digite um WhatsApp válido');
+    this.setState({ searched: ph, myOrders: [] });
+    const r = this.state.campRow;
+    const [a, b] = await Promise.all([this.sb.rpc('my_orders', { p_phone: ph }), r ? this.sb.rpc('spins_left', { p_campaign: r.id, p_phone: ph }) : Promise.resolve({ data: 0 })]);
+    if (a.error) return this.err(a.error);
+    this.setState({ myOrders: a.data || [], mySpins: b.data || 0 });
+  }
+  async wLoginPh(ph) {
+    ph = Component.digits(ph); if (ph.length < 10) return this.toast('Digite um WhatsApp válido');
+    const r = this.state.campRow; if (!r) return;
+    const { data } = await this.sb.rpc('spins_left', { p_campaign: r.id, p_phone: ph });
+    this.setState({ wPhone: ph, spinsLeft: data || 0, wResult: null, myWins: [] });
+  }
+  async doSpin() {
+    const s = this.state, wheel = (s.camp && s.camp.wheel) || [];
+    if (s.spinning || wheel.length < 2 || s.spinsLeft <= 0) return;
+    this.setState({ spinning: true, wResult: null });
+    const { data, error } = await this.sb.rpc('spin_wheel', { p_campaign: s.campRow.id, p_phone: s.wPhone });
+    if (error) { this.setState({ spinning: false }); return this.err(error); }
+    const seg = 360 / wheel.length, center = data.index * seg + seg / 2 + (Math.random() - 0.5) * seg * 0.6;
+    const cur = ((s.wDeg % 360) + 360) % 360, delta = ((360 - center - cur) % 360 + 360) % 360;
+    this.setState({ wDeg: s.wDeg + 1800 + delta });
+    setTimeout(() => this.setState(st => ({ spinning: false, wResult: { label: data.label, loss: data.loss }, spinsLeft: data.left, myWins: data.loss ? st.myWins : [{ label: data.label, at: Date.now() }, ...st.myWins] })), 4400);
+  }
+
+  async login() {
+    const s = this.state;
+    if (!s.email.trim() || !s.pass) return this.setState({ passErr: 'Informe e-mail e senha' });
+    this.setState({ authBusy: true, passErr: '' });
+    const { error } = await this.sb.auth.signInWithPassword({ email: s.email.trim(), password: s.pass });
+    if (error) return this.setState({ authBusy: false, passErr: 'E-mail ou senha incorretos' });
+    await this.checkAdmin();
+    this.setState({ authBusy: false });
+  }
+  async checkAdmin() {
+    const { data } = await this.sb.rpc('is_admin');
+    if (data === true) { this.setState({ adm: true, pass: '' }); this.loadAdmin(); }
+    else { await this.sb.auth.signOut(); this.setState({ adm: false, passErr: 'Este usuário não tem permissão de administrador.' }); }
+  }
+  async loadAdmin() {
+    this.setState({ aLoading: true });
+    const { data, error } = await this.sb.from('campaigns').select('*').order('created_at', { ascending: false }).limit(1);
+    if (error) { this.setState({ aLoading: false }); return this.err(error); }
+    const r = data && data[0];
+    if (!r) return this.setState({ aLoading: false, campRow: null, cEdit: null, camp: null });
+    this.setState(s => ({ campRow: r, camp: Component.toC(r), cEdit: s.dirty && s.cEdit ? s.cEdit : Component.toC(r) }));
+    await Promise.all([this.loadOrders(r), this.loadPrizesAdm(r.id), this.loadResult(r.id), this.loadSpins(r.id)]);
+    this.setState({ aLoading: false });
+  }
+  async loadOrders(r) {
+    r = r || this.state.campRow; if (!r) return;
+    let all = [], from = 0;
+    for (;;) {
+      const { data, error } = await this.sb.from('orders').select('id,name,phone,qty,total,status,created_at,paid_at').eq('campaign_id', r.id).order('created_at', { ascending: false }).range(from, from + 999);
+      if (error || !data) break; all = all.concat(data); if (data.length < 1000) break; from += 1000;
+    }
+    const { count } = await this.sb.from('order_numbers').select('*', { count: 'exact', head: true }).eq('campaign_id', r.id);
+    this.setState({ aOrders: all.map(o => ({ ...o, total: Number(o.total), createdAt: Date.parse(o.created_at), paidAt: o.paid_at ? Date.parse(o.paid_at) : null })), sold: count || 0, lastSync: Date.now() });
+  }
+  async loadPrizesAdm(id) {
+    const { data } = await this.sb.from('prize_numbers').select('*').eq('campaign_id', id).order('number');
+    const pn = data || [], owners = {};
+    if (pn.length) {
+      const { data: on } = await this.sb.from('order_numbers').select('number, orders(name, phone)').eq('campaign_id', id).in('number', pn.map(p => p.number));
+      (on || []).forEach(x => { owners[x.number] = x.orders; });
+    }
+    this.setState({ prizeNumbers: pn, pnOwners: owners });
+  }
+  async loadSpins(id) { const { data } = await this.sb.from('spins').select('*').eq('campaign_id', id).order('created_at', { ascending: false }).limit(200); this.setState({ aSpins: data || [] }); }
+  async createCampaign() {
+    if (this.state.campRow && !confirm('Criar uma nova rifa? A atual fica salva, mas o site passa a mostrar a nova.')) return;
+    const { error } = await this.sb.from('campaigns').insert({ title: 'Nova rifa', description: '', price: 1, total: 100000, min_qty: 1, spins_every: 0, combos: [], quick: [10, 25, 50, 100, 250, 500], wheel: [], ranking_on: false, ranking_text: '' });
+    if (error) return this.err(error);
+    this.setState({ dirty: false, tab: 'campanha', prizeNumbers: [], result: null });
+    await this.loadAdmin(); this.loadPublic();
+    this.toast('Rifa criada. Configure os detalhes e salve.');
+  }
+  async saveCampaign() {
+    const s = this.state, row = Component.fromC(s.cEdit);
+    if (!row.title) return this.toast('Informe o título');
+    if (!(row.price > 0)) return this.toast('Informe o valor de cada cota');
+    if (!(row.total > 0)) return this.toast('Informe o total de cotas');
+    if (row.total < s.sold) return this.toast(`O total não pode ser menor que as ${s.sold} cotas já vendidas`);
+    row.status = row.total > s.sold ? (s.campRow.status === 'finished' ? 'finished' : 'active') : 'sold_out';
+    this.setState({ saving: true });
+    const { data, error } = await this.sb.from('campaigns').update(row).eq('id', s.campRow.id).select().single();
+    this.setState({ saving: false });
+    if (error) return this.err(error);
+    this.setState({ campRow: data, camp: Component.toC(data), cEdit: Component.toC(data), dirty: false });
+    this.toast('Alterações salvas');
+  }
+  setC(patch) { this.setState(s => ({ cEdit: { ...s.cEdit, ...patch }, dirty: true })); }
+  async addPN() {
+    const s = this.state, total = Math.max(1, Component.int(s.cEdit.total)), nn = Component.int(s.newPN.number);
+    if (s.newPN.number === '' || nn >= total) return this.toast('Número fora da faixa');
+    if (s.prizeNumbers.some(p => p.number === nn)) return this.toast('Esse número já é premiado');
+    if (!s.newPN.prize.trim()) return this.toast('Informe o prêmio');
+    const { error } = await this.sb.from('prize_numbers').insert({ campaign_id: s.campRow.id, number: nn, prize: s.newPN.prize.trim() });
+    if (error) return this.err(error);
+    this.setState({ newPN: { number: '', prize: '' } }); this.loadPrizesAdm(s.campRow.id); this.toast('Cota premiada adicionada');
+  }
+  updPN(p, prize) {
+    this.setState(s => ({ prizeNumbers: s.prizeNumbers.map(x => x.id === p.id ? { ...x, prize } : x) }));
+    clearTimeout(this._pnT[p.id]);
+    this._pnT[p.id] = setTimeout(() => this.sb.from('prize_numbers').update({ prize }).eq('id', p.id).then(({ error }) => error && this.err(error)), 700);
+  }
+  async rmPN(p) { if (!confirm('Remover esta cota premiada?')) return; const { error } = await this.sb.from('prize_numbers').delete().eq('id', p.id); if (error) return this.err(error); this.loadPrizesAdm(this.state.campRow.id); }
+  async confirmOrder(o) { const { error } = await this.sb.rpc('confirm_order', { p_order: o.id }); if (error) return this.err(error); this.toast('Pagamento confirmado e números gerados'); this.loadOrders(); this.loadPrizesAdm(this.state.campRow.id); }
+  async deleteOrder(o) { if (!confirm(`Excluir o pedido ${o.id}? Os números dele voltam a ficar livres.`)) return; const { error } = await this.sb.from('orders').delete().eq('id', o.id); if (error) return this.err(error); this.loadOrders(); }
+  async apurar() {
+    const s = this.state, C = Component, f = s.fedForm, total = Math.max(1, C.int(s.cEdit.total)), digits = String(total - 1).length;
+    const p1 = C.digits(f.p1), p2 = C.digits(f.p2);
+    if (!C.digits(f.concurso)) return this.toast('Informe o concurso');
+    if (p1.length < 5) return this.toast('O 1º prêmio deve ter 5 dígitos');
+    if (digits > 5 && p2.length < 5) return this.toast('Informe o 2º prêmio');
+    const drawn = parseInt(digits > 5 ? p2.slice(-(digits - 5)) + p1.slice(-5) : p1.slice(-digits), 10) % total;
+    const id = s.campRow.id, sel = 'number, order_id, orders(name, phone)';
+    let { data: up } = await this.sb.from('order_numbers').select(sel).eq('campaign_id', id).gte('number', drawn).order('number', { ascending: true }).limit(1);
+    let hit = up && up[0];
+    if (!hit) { const { data: dn } = await this.sb.from('order_numbers').select(sel).eq('campaign_id', id).lt('number', drawn).order('number', { ascending: false }).limit(1); hit = dn && dn[0]; }
+    if (!hit) return this.toast('Nenhuma cota vendida');
+    const row = { campaign_id: id, concurso: C.digits(f.concurso), draw_date: f.date || null, p1, p2, drawn, win: hit.number, order_id: hit.order_id, winner_name: C.shortName(hit.orders && hit.orders.name) };
+    const { error } = await this.sb.from('results').upsert(row);
+    if (error) return this.err(error);
+    this.setState({ result: { ...row, created_at: new Date().toISOString() } }); this.toast('Resultado apurado e publicado');
+  }
+  async clearRes() { if (!confirm('Apagar o resultado publicado?')) return; const { error } = await this.sb.from('results').delete().eq('campaign_id', this.state.campRow.id); if (error) return this.err(error); this.setState({ result: null }); }
+  doLookup(v) {
+    this.setState({ lookup: v, lookupRes: null }); clearTimeout(this._lkT);
+    if (v === '' || !this.state.campRow) return;
+    this._lkT = setTimeout(async () => {
+      const { data } = await this.sb.from('order_numbers').select('number, order_id, orders(name, phone)').eq('campaign_id', this.state.campRow.id).eq('number', Component.int(v)).maybeSingle();
+      this.setState({ lookupRes: data ? { found: true, name: data.orders && data.orders.name, phone: data.orders && data.orders.phone, orderId: data.order_id } : { found: false } });
+    }, 400);
+  }
+  drawerSubmit() {
+    const s = this.state, C = Component, ph = C.digits(s.search);
+    if (ph.length < 10) return this.toast('Digite um WhatsApp válido');
+    if (s.dMode === 'cadastro') {
+      if (s.form.name.trim().split(/\s+/).length < 2) return this.toast('Informe nome e sobrenome');
+      this.setState({ form: { ...s.form, phone: C.fmtPhone(ph) }, dMode: null, menu: false });
+      this.toast('Cadastro feito! Agora é só escolher suas cotas');
+      return this.go('campanha');
+    }
+    this.setState({ dMode: null, menu: false });
+    this.doSearch(ph); this.wLoginPh(ph); this.go('meus');
+  }
+
+  renderVals() {
+    const s = this.state, C = Component, now = s.now, isAdm = s.page === 'admin', row = s.campRow, hasCamp = !!row;
+    const c = (isAdm ? s.cEdit : s.camp) || C.emptyC();
+    const total = Math.max(1, C.int(c.total)), digits = String(total - 1).length, pad = n => String(n).padStart(digits, '0');
+    const price = C.num(c.price), minQty = Math.max(1, C.int(c.minQty)), every = C.int(c.spinsEvery), wheel = c.wheel || [];
+    const spinsOn = every > 0 && wheel.length >= 2;
+    const sold = s.sold, rowTotal = row ? row.total : total, pct = Math.min(100, sold / Math.max(1, rowTotal) * 100);
+    const ended = hasCamp && (row.status !== 'active' || sold >= row.total);
+    const pctLabel = pct.toFixed(pct < 10 ? 1 : 0).replace('.', ',') + '%';
+    const prizeSet = new Map(s.prizeNumbers.map(p => [p.number, p.prize]));
+    const outMap = new Map(s.prizesOut.map(x => [x.number, x.name]));
+    const chipsFor = nums => (nums || []).slice(0, 3000).map(n => prizeSet.has(n) ? { n: pad(n), bg: 'oklch(0.8 0.15 150)', fg: '#0d1a10' } : { n: pad(n), bg: '#2e3946', fg: '#f2f5f7' });
+    const st = o => o.status === 'paid' ? { status: 'Pago', stBg: 'oklch(0.8 0.15 150)', stFg: '#0d1a10' } : o.status === 'canceled' ? { status: 'Cancelado', stBg: '#3d4a58', stFg: '#c9d1d9' } : { status: 'Aguardando', stBg: '#3a3320', stFg: 'oklch(0.85 0.13 75)' };
+    const images = String(c.imagesRaw || '').split('\n').map(x => x.trim()).filter(Boolean);
+    const imgIdx = images.length ? s.imgIdx % images.length : 0;
+    const qty = s.qty || 0, cost = C.priceFor(qty, c);
+    const isCombo = (c.combos || []).some(x => C.int(x.qty) === qty && C.num(x.price) > 0);
+    const setQ = q => this.setState({ qty: Math.max(0, Math.min(q, total)), qtyTouched: true });
+    const ranking = (s.ranking || []).map((r, i) => ({ pos: `${i + 1}º`, number: pad(r.number), name: r.name, when: C.ago(r.paid_at ? Date.parse(r.paid_at) : 0, now) }));
+    const res = s.result;
+
+    const myOrders = (s.myOrders || []).map(o => ({
+      id: o.id, qty: o.qty, total: C.brl(o.total), date: C.date(Date.parse(o.created_at)), ...st(o), isPaid: o.status === 'paid', isPending: o.status === 'pending', chips: chipsFor(o.numbers),
+      onPay: () => this.openPix({ id: o.id, qty: o.qty, total: Number(o.total), created_at: o.created_at })
+    }));
+
+    const n = wheel.length || 1, seg = 360 / n;
+    const segCol = i => wheel[i].loss ? '#34404d' : (i % 2 ? '#f2f5f7' : 'oklch(0.72 0.17 240)');
+    const segFg = i => wheel[i].loss ? '#9aa6b2' : (i % 2 ? '#0b2b52' : '#ffffff');
+    const wheelBg = wheel.length ? `conic-gradient(${wheel.map((w, i) => `${segCol(i)} ${i * seg}deg ${(i + 1) * seg}deg`).join(',')})` : '#2e3946';
+    const wSum = wheel.reduce((a, w) => a + Math.max(0, C.num(w.weight)), 0) || 1;
+
+    const winners = [
+      ...s.prizesOut.map(x => ({ name: x.name, prize: prizeSet.get(x.number) || 'Cota premiada', type: 'Cota premiada', number: pad(x.number), typeColor: 'oklch(0.8 0.15 150)', at: 1 })),
+      ...s.publicWins.map(g => ({ name: g.name, prize: g.label, type: 'Roleta', number: '', typeColor: 'oklch(0.85 0.13 75)', at: Date.parse(g.created_at) || 0 })),
+      ...(res ? [{ name: res.winner_name, prize: c.title, type: 'Loteria Federal', number: pad(res.win), typeColor: 'oklch(0.75 0.16 25)', at: Date.parse(res.created_at) || now }] : [])
+    ].sort((a, b) => b.at - a.at).map(w => ({ ...w, initial: (w.name || '?')[0] }));
+
+    const co = s.co, coOrder = co && co.order, coStep = co ? co.step : null;
+    const pixCode = s.pix.code || '';
+    let qrSrc = s.pix.qr ? 'data:image/png;base64,' + s.pix.qr : null;
+    if (!qrSrc && pixCode && window.qrcode) { this._qr = this._qr || {}; if (!this._qr[pixCode]) { try { const q = window.qrcode(0, 'M'); q.addData(pixCode); q.make(); this._qr[pixCode] = q.createDataURL(5, 2); } catch (e) {} } qrSrc = this._qr[pixCode] || null; }
+    const pixLeft = coOrder ? Date.parse(coOrder.created_at) + 30 * 60000 - now : 0;
+    const pixTimer = pixLeft > 0 ? `${String(Math.floor(pixLeft / 60000)).padStart(2, '0')}:${String(Math.floor(pixLeft % 60000 / 1000)).padStart(2, '0')}` : 'expirado';
+    const doneNums = (co && co.numbers) || [];
+    const doneHits = doneNums.filter(x => prizeSet.has(x)).map(x => ({ number: pad(x), prize: prizeSet.get(x) }));
+    const doneSpins = coOrder && spinsOn ? Math.floor(coOrder.qty / every) : 0;
+
+    // ADMIN
+    const aOrders = s.aOrders, paid = aOrders.filter(o => o.status === 'paid'), pending = aOrders.filter(o => o.status === 'pending');
+    const revenue = paid.reduce((a, o) => a + o.total, 0);
+    const d0 = new Date(); d0.setHours(0, 0, 0, 0); const today0 = d0.getTime();
+    const revToday = paid.filter(o => o.paidAt >= today0).reduce((a, o) => a + o.total, 0);
+    const rev7 = paid.filter(o => o.paidAt >= today0 - 6 * 864e5).reduce((a, o) => a + o.total, 0);
+    const paidQty = paid.reduce((a, o) => a + o.qty, 0);
+    const byPhone = new Map(); paid.forEach(o => { const x = byPhone.get(o.phone) || { name: o.name, phone: o.phone, cotas: 0, total: 0, orders: 0 }; x.cotas += o.qty; x.total += o.total; x.orders++; byPhone.set(o.phone, x); });
+    const repeat = [...byPhone.values()].filter(x => x.orders > 1).length;
+    const conv = aOrders.length ? Math.round(paid.length / aOrders.length * 100) : 0;
+    const days = []; for (let i = 13; i >= 0; i--) { const t = today0 - i * 864e5; days.push({ t, v: paid.filter(o => o.paidAt >= t && o.paidAt < t + 864e5).reduce((a, o) => a + o.total, 0) }); }
+    const maxDay = Math.max(...days.map(d => d.v), 0);
+    const best = days.reduce((a, d) => d.v > a.v ? d : a, { v: 0, t: 0 });
+    const ddmm = t => new Date(t).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    const bucketsDef = [['1 a 49 cotas', 1, 49], ['50 a 99', 50, 99], ['100 a 249', 100, 249], ['250 a 499', 250, 499], ['500 ou mais', 500, Infinity]];
+    const q = s.orderQ.toLowerCase().trim();
+    const orderRows = aOrders.filter(o => s.orderF === 'todos' || (s.orderF === 'pagos' ? o.status === 'paid' : o.status === 'pending'))
+      .filter(o => !q || o.name.toLowerCase().includes(q) || (C.digits(q) && o.phone.includes(C.digits(q))) || o.id.toLowerCase().includes(q))
+      .slice(0, 300).map(o => ({
+        id: o.id, name: o.name, phone: C.fmtPhone(o.phone), date: C.date(o.createdAt), qty: o.qty, total: C.brl(o.total), ...st(o), isPending: o.status === 'pending',
+        onConfirm: () => this.confirmOrder(o), onDelete: () => this.deleteOrder(o)
+      }));
+    const resOwner = res ? aOrders.find(o => o.id === res.order_id) : null;
+    const lk = s.lookupRes;
+    const updArr = (key, i, patch) => this.setC({ [key]: c[key].map((x, j) => j === i ? { ...x, ...patch } : x) });
+    const rmArr = (key, i) => this.setC({ [key]: c[key].filter((_, j) => j !== i) });
+    const fields = {}; ['title', 'desc', 'price', 'total', 'minQty', 'spinsEvery', 'drawInfo', 'imagesRaw', 'quickRaw', 'rankingMode', 'rankingText'].forEach(k => { fields[k] = e => this.setC({ [k]: e.target.value }); });
+    const campOK = s.adm && hasCamp;
+    const statusLabel = !row ? '' : row.status === 'active' ? (sold >= row.total ? 'Esgotada' : 'Ativa — vendendo') : row.status === 'sold_out' ? 'Esgotada' : 'Finalizada';
+
+    return {
+      isPublic: !isAdm, isAdmin: isAdm,
+      openMenu: () => this.setState({ menu: true }), closeMenu: () => this.setState({ menu: false, dMode: null }),
+      menuX: s.menu ? '0' : '-100%', menuOp: s.menu ? 1 : 0, menuPE: s.menu ? 'auto' : 'none',
+      drawerMain: [['campanha', 'Início', 'M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z'], ['meus', 'Meus números', 'M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4zM14 7v10'], ['roleta', 'Roleta da sorte', 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 3v18M3 12h18'], ['ganhadores', 'Ganhadores', 'M7 4h10v4a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M9 17h6']].map(([k, label, d]) => ({ label, d, border: s.page === k ? 'oklch(0.72 0.17 240 / .7)' : '#222', onClick: () => { this.setState({ menu: false, dMode: null }); this.go(k); } })),
+      dIdle: !s.dMode, dForm: !!s.dMode, dIsCadastro: s.dMode === 'cadastro',
+      dTitle: s.dMode === 'cadastro' ? 'Criar cadastro' : 'Entre para acompanhar seus números',
+      dSub: s.dMode === 'cadastro' ? 'Seus dados ficam salvos para agilizar a compra.' : s.dMode === 'entrar' ? 'Digite o WhatsApp usado na compra.' : 'Consulte compras, números e prêmios em um só lugar.',
+      dSubmitLabel: s.dMode === 'cadastro' ? 'Cadastrar' : 'Entrar',
+      dEntrar: () => this.setState({ dMode: 'entrar' }), dCadastro: () => this.setState({ dMode: 'cadastro' }), dCancel: () => this.setState({ dMode: null }),
+      dSubmit: () => this.drawerSubmit(), drawerKey: e => { if (e.key === 'Enter') this.drawerSubmit(); },
+      goMeus: () => this.go('meus'),
+      appShow: !s.appHidden, installHelp: s.installHelp, closeInstallHelp: () => this.setState({ installHelp: false }),
+      appDismiss: () => { localStorage.setItem('xc_app', '0'); this.setState({ appHidden: true }); },
+      installApp: async () => { if (this._dip) { this._dip.prompt(); const r = await this._dip.userChoice.catch(() => null); this._dip = null; if (r && r.outcome === 'accepted') this.setState({ appHidden: true }); } else this.setState({ installHelp: true }); },
+      rankLeader: ranking[0] || {}, rankRest: ranking.slice(1), rankModeLabel: c.rankingMode === 'maior' ? 'Maior título' : 'Menor título',
+      cookieShow: !isAdm && s.age === 'yes' && !s.cookie && !s.co && !s.menu,
+      acceptCookie: () => { localStorage.setItem('xc_cookie', '1'); this.setState({ cookie: true }); },
+      goHome: () => this.go('campanha'),
+      isCampanha: s.page === 'campanha', isMeus: s.page === 'meus', isRoleta: s.page === 'roleta', isGanhadores: s.page === 'ganhadores',
+      isLoading: s.loading, hasCamp: !s.loading && hasCamp, noCamp: !s.loading && !hasCamp,
+      c, hasImg: images.length > 0, noImg: images.length === 0, img: images[imgIdx] || '', multiImg: images.length > 1,
+      prevImg: () => this.setState({ imgIdx: (imgIdx - 1 + images.length) % images.length }), nextImg: () => this.setState({ imgIdx: imgIdx + 1 }),
+      dots: images.map((_, i) => ({ bg: i === imgIdx ? '#f2f5f7' : 'rgba(242,245,247,.4)', onClick: () => this.setState({ imgIdx: i }) })),
+      hot: pct >= 70 && !ended, priceLabel: C.brl(price), pctStr: pct.toFixed(2), pctLabel, ended,
+      soldLabel: sold.toLocaleString('pt-BR'), totalLabelAdm: total.toLocaleString('pt-BR'),
+      numHelp: `Com ${total.toLocaleString('pt-BR')} cotas, os números vão de ${pad(0)} a ${pad(total - 1)} (${digits} dígitos). Cada número existe uma única vez. Quando o pagamento é confirmado, o sistema sorteia números livres aleatoriamente para o comprador. Se algum deles for uma cota premiada, o prêmio sai na hora. O ganhador principal sai pela Loteria Federal (aba Sorteio). Evite mudar o total depois de começar a vender.`,
+      rankingOn: !!c.rankingOn && ranking.length > 0, rankingSub: c.rankingMode === 'maior' ? 'Quanto maior o seu número, melhor a sua posição' : 'Quanto menor o seu número, melhor a sua posição',
+      combos: (c.combos || []).filter(x => C.int(x.qty) > 0 && C.num(x.price) > 0).map(x => { const qq = C.int(x.qty), pp = C.num(x.price), off = Math.round((1 - pp / (qq * price || 1)) * 100); return { qty: qq, price: C.brl(pp), hasOff: off > 0, off: `-${off}%`, border: qq === qty ? 'oklch(0.72 0.17 240)' : '#34404d', onClick: () => setQ(qq) }; }),
+      quick: String(c.quickRaw || '').split(',').map(x => C.int(x)).filter(Boolean).slice(0, 9).map(v => ({ label: `+${v}`, onClick: () => setQ(qty + v) })),
+      qty, setQty: e => setQ(C.int(e.target.value)), qtyMinus: () => setQ(qty - 1), qtyPlus: () => setQ(qty + 1), qtyClear: () => setQ(0),
+      unitLabel: isCombo ? 'Combo promocional aplicado' : `${C.brl(price)}/un · mínimo ${minQty}`,
+      spinsEarn: spinsOn ? Math.floor(qty / every) : 0, hasSpinsEarn: spinsOn && Math.floor(qty / every) > 0, totalLabel: C.brl(cost),
+      buyLabel: ended ? 'Esgotado' : 'Garantir números',
+      openCheckout: () => {
+        if (!hasCamp) return;
+        if (ended) return this.toast('Esta campanha está esgotada');
+        if (qty < minQty) return this.toast(`Compra mínima de ${minQty} cotas`);
+        if (qty > row.total - sold) return this.toast(`Restam apenas ${row.total - sold} cotas`);
+        this.setState({ co: { step: 'form' }, coErr: '' });
+      },
+      prizeList: s.prizeNumbers.map(p => { const nm = outMap.get(p.number); return { number: pad(p.number), prize: p.prize, status: nm ? `Saiu · ${nm}` : 'Ainda não saiu', statusColor: nm ? 'oklch(0.8 0.15 150)' : '#9aa6b2', numColor: nm ? 'oklch(0.8 0.15 150)' : '#f2f5f7' }; }),
+      prizesOutLabel: `${s.prizesOut.length}/${s.prizeNumbers.length}`,
+      steps: [
+        { n: '1', title: 'Escolha e pague via PIX', text: `Selecione a quantidade de cotas (mínimo ${minQty}) e pague pelo QR code ou copia e cola.` },
+        { n: '2', title: 'Receba seus números na hora', text: 'Os números são gerados aleatoriamente após a confirmação. Se sair uma cota premiada, o prêmio é seu na hora.' },
+        { n: '3', title: 'Resultado pela Loteria Federal', text: digits > 5 ? 'Quando todas as cotas forem vendidas, o ganhador é definido pelo 1º e 2º prêmios da Loteria Federal.' : `Quando todas as cotas forem vendidas, o ganhador é definido pelos ${digits} últimos algarismos do 1º prêmio da Loteria Federal.` }
+      ],
+      showSticky: s.page === 'campanha' && hasCamp && !s.co && s.age === 'yes',
+      ageGate: !isAdm && s.age !== 'yes', ageAsk: s.age !== 'no', ageBlocked: s.age === 'no',
+      ageYes: () => { localStorage.setItem('xc_18', 'yes'); this.setState({ age: 'yes' }); },
+      ageNo: () => this.setState({ age: 'no' }), ageRetry: () => this.setState({ age: '' }),
+
+      search: s.search, setSearch: e => this.setState({ search: e.target.value }),
+      doSearch: () => this.doSearch(s.search), searchKey: e => { if (e.key === 'Enter') this.doSearch(s.search); },
+      searchEmpty: !!s.searched && myOrders.length === 0, myOrders, mySpins: s.mySpins, mySpinsShow: spinsOn && s.mySpins > 0,
+      goRoletaMine: () => { this.setState({ wPhone: s.searched, spinsLeft: s.mySpins, wResult: null }); this.go('roleta'); },
+
+      wheelRule: spinsOn ? `Ganhe 1 giro a cada ${every} cotas pagas.` : 'Gire e concorra a prêmios extras.', wheelEmpty: !spinsOn, wheelBg, wDeg: s.wDeg,
+      wheelLabels: wheel.map((w, i) => ({ label: w.label, angle: i * seg + seg / 2, fg: segFg(i) })),
+      wNotLogged: !s.wPhone, wLogged: !!s.wPhone, wInput: s.wInput, setWInput: e => this.setState({ wInput: e.target.value }),
+      wLogin: () => this.wLoginPh(s.wInput), wLogout: e => { e.preventDefault(); this.setState({ wPhone: '', wResult: null }); }, wPhoneLabel: C.fmtPhone(s.wPhone),
+      spinsLeft: s.spinsLeft, spin: () => this.doSpin(), spinDisabled: s.spinning || s.spinsLeft <= 0 || !spinsOn,
+      spinLabel: s.spinning ? 'Girando…' : s.spinsLeft > 0 ? 'Girar roleta' : 'Sem giros. Compre cotas',
+      hasResult: !!s.wResult && !s.spinning, resultBg: s.wResult && !s.wResult.loss ? 'oklch(0.8 0.15 150)' : '#2e3946', resultFg: s.wResult && !s.wResult.loss ? '#0d1a10' : '#f2f5f7',
+      resultText: s.wResult ? (s.wResult.loss ? s.wResult.label : `Você ganhou: ${s.wResult.label}!`) : '',
+      myWins: s.myWins.map(g => ({ label: g.label, when: C.ago(g.at, now) })), hasMyWins: s.myWins.length > 0,
+      winners, noWinners: winners.length === 0,
+
+      coOpen: !!co, coForm: coStep === 'form', coPix: coStep === 'pix', coDone: coStep === 'done',
+      coTitle: coStep === 'form' ? 'Finalizar compra' : coStep === 'pix' ? 'Pague com PIX' : 'Pagamento confirmado!',
+      closeCheckout: () => { clearInterval(this._payT); this.setState({ co: null, pix: {} }); }, stop: e => e.stopPropagation(),
+      form: s.form, coErr: s.coErr, genPix: () => this.genPix(), genLabel: s.coBusy ? 'Gerando…' : 'Gerar PIX',
+      setFName: e => this.setState({ form: { ...s.form, name: e.target.value } }),
+      setFPhone: e => this.setState({ form: { ...s.form, phone: C.fmtPhone(e.target.value) } }),
+      setFTerms: e => this.setState({ form: { ...s.form, terms: e.target.checked } }),
+      coTotal: coOrder ? C.brl(coOrder.total) : '', coOrderId: coOrder ? coOrder.id : '', pixTimer, pixCode, qrSrc: qrSrc || '', hasQr: !!qrSrc, noQr: !qrSrc,
+      pixStatus: s.pix.loading ? 'Gerando seu PIX…' : s.pix.err ? 'PIX automático indisponível. Fale com o suporte.' : 'Aguardando pagamento…',
+      pixStatusColor: s.pix.err ? 'oklch(0.75 0.16 25)' : 'oklch(0.85 0.13 75)',
+      copyPix: () => { if (!pixCode) return; navigator.clipboard && navigator.clipboard.writeText(pixCode); this.toast('Código PIX copiado'); },
+      simulatePay: () => coOrder && this.checkPay(coOrder.id, false),
+      doneHits, doneQty: doneNums.length, doneChips: chipsFor(doneNums), doneSpins, doneHasSpins: doneSpins > 0,
+      goSpinFromDone: () => { const ph = C.digits(s.form.phone); clearInterval(this._payT); this.setState({ co: null, pix: {} }); this.wLoginPh(ph); this.go('roleta'); },
+
+      adm: s.adm, notAdm: !s.adm, email: s.email, setEmail: e => this.setState({ email: e.target.value, passErr: '' }),
+      pass: s.pass, passErr: s.passErr, setPass: e => this.setState({ pass: e.target.value, passErr: '' }),
+      login: () => this.login(), passKey: e => { if (e.key === 'Enter') this.login(); }, loginLabel: s.authBusy ? 'Entrando…' : 'Entrar',
+      logout: async () => { await this.sb.auth.signOut(); this.setState({ adm: false, pass: '' }); },
+      aLoading: s.adm && s.aLoading && !hasCamp, noCampAdm: s.adm && !s.aLoading && !hasCamp, createCampaign: () => this.createCampaign(), statusLabel,
+      tabs: campOK ? [['geral', 'Dashboard'], ['campanha', 'Campanha'], ['cotas', 'Cotas premiadas'], ['roleta', 'Roleta'], ['pedidos', 'Pedidos'], ['sorteio', 'Sorteio']].map(([k, label]) => ({ label, bg: s.tab === k ? '#f2f5f7' : 'transparent', fg: s.tab === k ? '#1e2630' : '#f2f5f7', onClick: () => this.setState({ tab: k }) })) : [],
+      tGeral: campOK && s.tab === 'geral', tCampanha: campOK && s.tab === 'campanha', tCotas: campOK && s.tab === 'cotas', tRoleta: campOK && s.tab === 'roleta', tPedidos: campOK && s.tab === 'pedidos', tSorteio: campOK && s.tab === 'sorteio',
+      refresh: () => this.loadAdmin(), lastSyncLabel: s.lastSync ? `Atualizado ${C.ago(s.lastSync, now)} · atualiza sozinho a cada 20s` : '',
+      stats: [
+        { label: 'Faturamento', value: C.brl(revenue), sub: `Hoje ${C.brl(revToday)} · 7 dias ${C.brl(rev7)}`, color: 'oklch(0.8 0.15 150)' },
+        { label: 'Cotas vendidas', value: sold.toLocaleString('pt-BR'), sub: `${pctLabel} do total`, color: '#f2f5f7' },
+        { label: 'Pedidos pagos', value: String(paid.length), sub: `${conv}% dos pedidos viraram pagamento`, color: '#f2f5f7' },
+        { label: 'Ticket médio', value: C.brl(paid.length ? revenue / paid.length : 0), sub: `${paid.length ? Math.round(paidQty / paid.length) : 0} cotas por pedido`, color: '#f2f5f7' },
+        { label: 'Aguardando pagamento', value: C.brl(pending.reduce((a, o) => a + o.total, 0)), sub: `${pending.length} pedido(s)`, color: 'oklch(0.85 0.13 75)' },
+        { label: 'Clientes', value: String(byPhone.size), sub: `${repeat} compraram mais de uma vez`, color: '#f2f5f7' }
+      ],
+      salesDays: days.map(d => ({ label: ddmm(d.t), h: maxDay ? Math.round(d.v / maxDay * 100) : 0, bg: d.t === today0 ? 'oklch(0.8 0.15 150)' : 'oklch(0.72 0.17 240)', tip: `${ddmm(d.t)}: ${C.brl(d.v)}` })),
+      bestDay: best.v ? `${ddmm(best.t)} · ${C.brl(best.v)}` : 'sem vendas no período',
+      topClients: [...byPhone.values()].sort((a, b) => b.cotas - a.cotas).slice(0, 10).map((x, i) => ({ pos: String(i + 1), name: x.name, phone: C.fmtPhone(x.phone), cotas: x.cotas.toLocaleString('pt-BR'), total: C.brl(x.total), orders: x.orders, badge: i === 0 ? 'oklch(0.86 0.13 88)' : '#2e3946', badgeFg: i === 0 ? '#2a2208' : '#f2f5f7' })),
+      noTop: byPhone.size === 0,
+      buckets: bucketsDef.map(([label, a, b]) => { const cnt = paid.filter(o => o.qty >= a && o.qty <= b).length, p = paid.length ? Math.round(cnt / paid.length * 100) : 0; return { label, count: cnt, pct: `${p}%`, w: p }; }),
+      recentOrders: aOrders.slice(0, 6).map(o => ({ name: o.name, qty: o.qty, total: C.brl(o.total), ...st(o) })),
+      showSave: isAdm && s.adm && s.dirty, saveCampaign: () => this.saveCampaign(), saving: s.saving, saveLabel: s.saving ? 'Salvando…' : 'Salvar',
+      discardChanges: () => this.setState({ cEdit: row ? C.toC(row) : null, dirty: false }),
+      f: fields, setRankingOn: e => this.setC({ rankingOn: e.target.checked }),
+      comboRows: (c.combos || []).map((x, i) => ({ qty: x.qty, price: x.price, onQty: e => updArr('combos', i, { qty: e.target.value }), onPrice: e => updArr('combos', i, { price: e.target.value }), onRemove: () => rmArr('combos', i) })),
+      addCombo: () => this.setC({ combos: [...(c.combos || []), { qty: '', price: '' }] }),
+      newPN: s.newPN, rangeLabel: `${pad(0)} a ${pad(total - 1)}`,
+      setPNNumber: e => this.setState({ newPN: { ...s.newPN, number: e.target.value.replace(/\D/g, '') } }),
+      setPNPrize: e => this.setState({ newPN: { ...s.newPN, prize: e.target.value } }),
+      randPN: () => { let r, g = 0; do { r = Math.floor(Math.random() * total); g++; } while (prizeSet.has(r) && g < 50); this.setState({ newPN: { ...s.newPN, number: pad(r) } }); },
+      addPN: () => this.addPN(),
+      pnRows: s.prizeNumbers.map(p => { const o = s.pnOwners[p.number]; return { number: pad(p.number), prize: p.prize, status: o ? `Saiu · ${o.name} · ${C.fmtPhone(o.phone)}` : 'Ainda não saiu', statusColor: o ? 'oklch(0.8 0.15 150)' : '#9aa6b2', onPrize: e => this.updPN(p, e.target.value), onRemove: () => this.rmPN(p) }; }),
+      wheelRows: wheel.map((w, i) => ({ label: w.label, weight: w.weight, loss: !!w.loss, swatch: segCol(i), prob: `${Math.round(Math.max(0, C.num(w.weight)) / wSum * 100)}%`, onLabel: e => updArr('wheel', i, { label: e.target.value }), onWeight: e => updArr('wheel', i, { weight: e.target.value.replace(/[^\d.,]/g, '') }), onLoss: e => updArr('wheel', i, { loss: e.target.checked }), onRemove: () => rmArr('wheel', i) })),
+      addWheel: () => this.setC({ wheel: [...wheel, { label: 'Novo prêmio', weight: '10', loss: false }] }),
+      spinLog: s.aSpins.slice(0, 50).map(g => ({ name: g.name || C.fmtPhone(g.phone), label: g.label, when: C.ago(Date.parse(g.created_at), now), color: g.loss ? '#9aa6b2' : 'oklch(0.8 0.15 150)' })), noSpinLog: s.aSpins.length === 0,
+      orderFilters: [['todos', `Todos (${aOrders.length})`], ['pendentes', `Pendentes (${pending.length})`], ['pagos', `Pagos (${paid.length})`]].map(([k, label]) => ({ label, bg: s.orderF === k ? '#f2f5f7' : 'transparent', fg: s.orderF === k ? '#1e2630' : '#f2f5f7', onClick: () => this.setState({ orderF: k }) })),
+      orderQ: s.orderQ, setOrderQ: e => this.setState({ orderQ: e.target.value }), orderRows, noOrders: aOrders.length === 0 || orderRows.length === 0,
+      fedRule: digits > 5
+        ? `O número ganhador é formado pelos ${digits - 5} último(s) algarismo(s) do 2º prêmio seguidos dos 5 algarismos do 1º prêmio da Loteria Federal. Se esse número não tiver sido vendido, ganha o próximo número vendido acima dele; se não houver, o último vendido abaixo.`
+        : `O número ganhador é formado pelos ${digits} último(s) algarismo(s) do 1º prêmio da Loteria Federal. Se esse número não tiver sido vendido, ganha o próximo número vendido acima dele; se não houver, o último vendido abaixo.`,
+      p2Hint: digits > 5 ? '5 dígitos' : 'opcional',
+      fedForm: s.fedForm, fed: Object.fromEntries(['concurso', 'date', 'p1', 'p2'].map(k => [k, e => this.setState({ fedForm: { ...this.state.fedForm, [k]: k === 'date' ? e.target.value : e.target.value.replace(/\D/g, '') } })])),
+      apurar: () => this.apurar(), clearRes: () => this.clearRes(),
+      hasRes: !!res, noRes: !res,
+      res: res ? {
+        drawn: pad(res.drawn), winnerNumber: pad(res.win), name: resOwner ? resOwner.name : res.winner_name, shortName: res.winner_name, phone: resOwner ? C.fmtPhone(resOwner.phone) : '', orderId: res.order_id, p1: res.p1,
+        concursoLabel: `Concurso ${res.concurso}${res.draw_date ? ' · ' + String(res.draw_date).split('-').reverse().join('/') : ''}`,
+        hasNote: res.drawn !== res.win, note: `Número sorteado ${pad(res.drawn)} não foi vendido; contemplado o próximo número vendido (${pad(res.win)}).`
+      } : {},
+      lookup: s.lookup, setLookup: e => this.doLookup(e.target.value.replace(/\D/g, '')), hasLookup: s.lookup !== '' && !!lk,
+      lookupResult: !lk ? '' : lk.found ? `${pad(C.int(s.lookup))} → ${lk.name} · ${C.fmtPhone(lk.phone)} · ${lk.orderId}` : `${pad(C.int(s.lookup))} → número ainda não vendido`,
+      lookupColor: lk && lk.found ? 'oklch(0.8 0.15 150)' : '#9aa6b2',
+      hasToast: !!s.toast, toast: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>
