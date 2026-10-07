@@ -1257,27 +1257,34 @@ class Component extends DCLogic {
     this.toast('Alterações salvas');
   }
   async uploadImages(files) {
-    files = Array.from(files || []).filter(f => f.type.startsWith('image/'));
-    if (!files.length || !this.state.campRow) return;
+    files = Array.from(files || []).filter(f => (f.type || '').startsWith('image/') || /\.(jpe?g|png|webp|gif|heic|heif)$/i.test(f.name || ''));
+    if (!this.state.campRow) return this.toast('Crie ou selecione uma rifa antes de enviar fotos');
+    if (!files.length) return this.toast('Escolha arquivos de imagem (JPG, PNG ou WEBP)');
     this.setState(s => ({ uploading: (s.uploading || 0) + files.length }));
     const shrink = f => new Promise(res => {
       const img = new Image(), url = URL.createObjectURL(f);
       img.onload = () => { const m = 1600, k = Math.min(1, m / Math.max(img.width, img.height)), cv = document.createElement('canvas'); cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k); cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(url); cv.toBlob(b => res(b || f), 'image/jpeg', 0.85); };
-      img.onerror = () => { URL.revokeObjectURL(url); res(f); };
+      img.onerror = () => { URL.revokeObjectURL(url); res(/heic|heif/i.test(f.type + f.name) ? null : f); };
       img.src = url;
     });
     for (const f of files) {
       try {
         const blob = await shrink(f);
+        if (!blob) throw new Error(`${f.name}: formato HEIC não suportado neste navegador. Converta para JPG ou envie pelo celular.`);
         const b64 = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(',')[1]); fr.onerror = rej; fr.readAsDataURL(blob); });
-        const { data, error } = await this.sb.functions.invoke('github-upload', { body: { campaign_id: this.state.campRow.id, content_base64: b64 } });
-        if (error || !data || !data.url) throw (data && data.error) ? new Error(data.error) : (error || new Error('Falha ao enviar'));
-        this._preview = this._preview || {}; this._preview[data.url] = URL.createObjectURL(blob);
+        let url = '', ghErr = '';
+        try {
+          const { data, error } = await this.sb.functions.invoke('github-upload', { body: { campaign_id: this.state.campRow.id, content_base64: b64 } });
+          if (data && data.url) url = data.url; else ghErr = (data && data.error) || (error && error.message) || 'sem resposta';
+        } catch (e) { ghErr = String(e.message || e); }
+        if (!url) throw new Error('Não foi possível enviar ao GitHub: ' + ghErr);
+        const data = { url };
+        this._upOk = true; this._preview = this._preview || {}; this._preview[data.url] = URL.createObjectURL(blob);
         this.setState(s => { const list = String(s.cEdit.imagesRaw || '').split('\n').map(x => x.trim()).filter(Boolean); return { cEdit: { ...s.cEdit, imagesRaw: [...list, data.url].join('\n') }, dirty: true }; });
       } catch (e) { this.err(e, 'Falha ao enviar a foto'); }
       this.setState(s => ({ uploading: Math.max(0, (s.uploading || 1) - 1) }));
     }
-    this.toast('Fotos enviadas ao GitHub. Clique em Salvar; elas aparecem no site em ~1 minuto.');
+    if (this._upOk) this.toast('Fotos enviadas. Clique em Salvar para publicar.'); this._upOk = false;
   }
   setC(patch) { this.setState(s => ({ cEdit: { ...s.cEdit, ...patch }, dirty: true })); }
   async addPN() {
@@ -1586,7 +1593,7 @@ class Component extends DCLogic {
         onRemove: () => this.setC({ imagesRaw: images.filter((_, j) => j !== i).join('\n') }),
         onLeft: () => { if (i === 0) return; const a = images.slice(); [a[i - 1], a[i]] = [a[i], a[i - 1]]; this.setC({ imagesRaw: a.join('\n') }); } })),
       uploadLabel: s.uploading ? `Enviando ${s.uploading}…` : 'Adicionar fotos',
-      onPickImages: e => { const fl = e.target.files; this.uploadImages(fl); e.target.value = ''; },
+      onPickImages: e => { const fl = Array.from(e.target.files || []); e.target.value = ''; this.uploadImages(fl); },
       f: fields, setRankingOn: e => this.setC({ rankingOn: e.target.checked }),
       comboRows: (c.combos || []).map((x, i) => ({ qty: x.qty, price: x.price, onQty: e => updArr('combos', i, { qty: e.target.value }), onPrice: e => updArr('combos', i, { price: e.target.value }), onRemove: () => rmArr('combos', i) })),
       addCombo: () => this.setC({ combos: [...(c.combos || []), { qty: '', price: '' }] }),
