@@ -1,0 +1,16 @@
+SITE XANDE CORTES — arquivos
+
+index.html ............ site completo (público + /admin). Abra direto no navegador.
+manifest.json, sw.js,
+icon-192/512.png ...... instalação como app (precisa estar em HTTPS)
+logo-xande-cortes.png . logo
+supabase/schema.sql ... banco de dados: rode no SQL Editor do Supabase
+fonte/ ................ arquivo-fonte editável do design
+
+Hospedagem: suba a pasta inteira em Vercel, Netlify ou Hostinger.
+Para /admin funcionar no domínio, configure o redirecionamento de todas as rotas para index.html
+(Vercel: vercel.json com rewrites; Netlify: arquivo _redirects com "/*  /index.html  200").
+
+IMPORTANTE: nesta versão os dados ficam salvos no navegador e o PIX é simulado.
+Próximo passo: ligar ao Supabase (schema.sql) e a um gateway PIX (Mercado Pago/Asaas).
+Senha demo do admin: xande123 (será trocada pelo login do Supabase).

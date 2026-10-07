@@ -10,6 +10,8 @@
 <helmet>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1e2630">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon-64.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,6 +20,8 @@
 <style>
 body{margin:0;background:#1e2630;color:#f2f5f7;font-family:Montserrat,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 *{box-sizing:border-box}
+input,textarea,select{max-width:100%;min-width:0}
+label{min-width:0}
 a{color:oklch(0.72 0.17 240)}
 a:hover{color:#f2f5f7}
 input,textarea,select,button{font-family:inherit}
@@ -456,7 +460,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
           <button onClick="{{ createCampaign }}" style="border:none;border-radius:14px;padding:14px 20px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));color:#ffffff;font-weight:800;font-size:15px;cursor:pointer;transition:transform .18s ease,filter .18s ease;" style-hover="transform:translateY(-2px);filter:brightness(1.08);">Criar primeira rifa</button>
         </div>
       </sc-if>
-      <nav style="display:flex;gap:6px;overflow-x:auto;">
+      <nav style="display:flex;gap:6px;flex-wrap:wrap;">
         <sc-for list="{{ tabs }}" as="t">
           <button onClick="{{ t.onClick }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;flex:none;border:1px solid #3d4a58;background:{{ t.bg }};color:{{ t.fg }};border-radius:14px;padding:9px 14px;font-weight:700;font-size:13px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">{{ t.label }}</button>
         </sc-for>
@@ -540,7 +544,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
             <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Dados da campanha</span>
             <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Título<input value="{{ c.title }}" onChange="{{ f.title }}" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
             <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Descrição<textarea value="{{ c.desc }}" onChange="{{ f.desc }}" rows="3" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;resize:vertical;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></textarea></label>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;">
               <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Valor de cada cota (R$)<input value="{{ c.price }}" onChange="{{ f.price }}" inputMode="decimal" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
               <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Total de cotas (vagas)<input value="{{ c.total }}" onChange="{{ f.total }}" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
               <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Compra mínima<input value="{{ c.minQty }}" onChange="{{ f.minQty }}" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
@@ -555,7 +559,27 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
               <span>{{ numHelp }}</span>
             </div>
             <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Forma de sorteio<input value="{{ c.drawInfo }}" onChange="{{ f.drawInfo }}" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
-            <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Fotos (uma URL por linha)<textarea value="{{ c.imagesRaw }}" onChange="{{ f.imagesRaw }}" rows="3" placeholder="https://…" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:13px;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;outline:none;resize:vertical;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></textarea></label>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:12px;font-weight:700;color:#9aa6b2;">Fotos da ação · a primeira é a capa</span>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;">
+                <sc-for list="{{ adminImgs }}" as="im">
+                  <div style="position:relative;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:#1e2630;border:1px solid {{ im.border }};">
+                    <img src="{{ im.src }}" alt="Foto" style="width:100%;height:100%;object-fit:cover;display:block;">
+                    <sc-if value="{{ im.isCover }}"><span style="position:absolute;left:6px;top:6px;background:oklch(0.72 0.17 240);color:#fff;font-size:10px;font-weight:800;border-radius:6px;padding:2px 6px;">Capa</span></sc-if>
+                    <div style="position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;padding:6px;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.6));">
+                      <button onClick="{{ im.onLeft }}" aria-label="Mover para a esquerda" style="width:28px;height:28px;border:none;border-radius:8px;background:rgba(15,20,25,.8);color:#fff;font-size:14px;cursor:pointer;">‹</button>
+                      <button onClick="{{ im.onRemove }}" aria-label="Remover foto" style="width:28px;height:28px;border:none;border-radius:8px;background:rgba(15,20,25,.8);color:#fff;font-size:12px;cursor:pointer;">✕</button>
+                    </div>
+                  </div>
+                </sc-for>
+                <label style="aspect-ratio:1/1;border:2px dashed #3d4a58;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;padding:6px;cursor:pointer;color:#c9d1d9;font-size:12px;font-weight:700;transition:border-color .18s ease,background-color .18s ease;" style-hover="border-color:oklch(0.72 0.17 240);background-color:#26303b;">
+                  <span style="font-size:24px;line-height:1;color:oklch(0.72 0.17 240);">+</span>
+                  <span>{{ uploadLabel }}</span>
+                  <input type="file" accept="image/*" multiple="{{ true }}" onChange="{{ onPickImages }}" style="display:none;">
+                </label>
+              </div>
+              <span style="font-size:12px;color:#7a8692;">Do celular abre a galeria ou a câmera; do notebook, escolha os arquivos. As fotos vão para a pasta /fotos do GitHub. Depois clique em Salvar.</span>
+            </div>
           </div>
           <div style="display:flex;flex-direction:column;gap:16px;">
             <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;">
@@ -585,9 +609,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;">
           <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Nova cota premiada</span>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <input value="{{ newPN.number }}" onChange="{{ setPNNumber }}" placeholder="Número" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;width:140px;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+            <input value="{{ newPN.number }}" onChange="{{ setPNNumber }}" placeholder="Número" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1 1 110px;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
             <button onClick="{{ randPN }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:transparent;color:#f2f5f7;border-radius:14px;padding:0 12px;font-weight:700;font-size:13px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Aleatório</button>
-            <input value="{{ newPN.prize }}" onChange="{{ setPNPrize }}" placeholder="Prêmio (ex: R$ 500 no PIX)" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1;min-width:200px;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+            <input value="{{ newPN.prize }}" onChange="{{ setPNPrize }}" placeholder="Prêmio (ex: R$ 500 no PIX)" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1 1 200px;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
             <button onClick="{{ addPN }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;border-radius:14px;padding:0 16px;font-weight:800;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">Adicionar</button>
           </div>
           <span style="font-size:12px;color:#9aa6b2;">Quem receber esse número numa compra paga ganha o prêmio na hora. Faixa válida: {{ rangeLabel }}.</span>
@@ -595,9 +619,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         <div style="display:flex;flex-direction:column;gap:6px;">
           <sc-for list="{{ pnRows }}" as="p">
             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#26303b;border:1px solid #34404d;border-radius:12px;padding:10px 12px;">
-              <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-weight:700;width:90px;">{{ p.number }}</span>
-              <input value="{{ p.prize }}" onChange="{{ p.onPrize }}" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1;min-width:160px;background:#1e2630;border:1px solid #3d4a58;border-radius:8px;padding:8px 10px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
-              <span style="font-size:13px;font-weight:700;color:{{ p.statusColor }};min-width:160px;">{{ p.status }}</span>
+              <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-weight:700;">{{ p.number }}</span>
+              <input value="{{ p.prize }}" onChange="{{ p.onPrize }}" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1 1 160px;background:#1e2630;border:1px solid #3d4a58;border-radius:8px;padding:8px 10px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+              <span style="font-size:13px;font-weight:700;color:{{ p.statusColor }};flex:1 1 100%;">{{ p.status }}</span>
               <button onClick="{{ p.onRemove }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:transparent;color:#9aa6b2;border-radius:8px;width:36px;height:36px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">✕</button>
             </div>
           </sc-for>
@@ -608,15 +632,18 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:16px;align-items:start;">
           <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;">
             <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Prêmios da roleta</span>
-            <div style="display:flex;gap:8px;font-size:11px;color:#9aa6b2;font-weight:700;text-transform:uppercase;"><span style="width:10px;"></span><span style="flex:1;">Prêmio</span><span style="width:64px;">Peso</span><span style="width:52px;">Chance</span><span style="width:44px;text-align:center;">Perde</span><span style="width:36px;"></span></div>
             <sc-for list="{{ wheelRows }}" as="r">
-              <div style="display:flex;gap:8px;align-items:center;">
-                <span style="width:10px;height:10px;border-radius:3px;flex:none;background:{{ r.swatch }};border:1px solid #3d4a58;"></span>
-                <input value="{{ r.label }}" onChange="{{ r.onLabel }}" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1;min-width:0;background:#1e2630;border:1px solid #3d4a58;border-radius:8px;padding:9px 10px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
-                <input value="{{ r.weight }}" onChange="{{ r.onWeight }}" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;width:64px;background:#1e2630;border:1px solid #3d4a58;border-radius:8px;padding:9px 10px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
-                <span style="width:52px;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:12px;color:#9aa6b2;">{{ r.prob }}</span>
-                <span style="width:44px;display:flex;justify-content:center;"><input type="checkbox" checked="{{ r.loss }}" onChange="{{ r.onLoss }}" style="width:18px;height:18px;accent-color:oklch(0.72 0.17 240);"></span>
-                <button onClick="{{ r.onRemove }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:transparent;color:#9aa6b2;border-radius:8px;width:36px;height:36px;flex:none;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">✕</button>
+              <div style="background:#1e2630;border:1px solid #34404d;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <span style="width:12px;height:12px;border-radius:4px;flex:none;background:{{ r.swatch }};border:1px solid #3d4a58;"></span>
+                  <input value="{{ r.label }}" onChange="{{ r.onLabel }}" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1;min-width:0;background:#1e2630;border:1px solid #3d4a58;border-radius:8px;padding:9px 10px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+                  <button onClick="{{ r.onRemove }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:transparent;color:#9aa6b2;border-radius:8px;width:36px;height:36px;flex:none;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">✕</button>
+                </div>
+                <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px;color:#9aa6b2;">
+                  <label style="display:flex;align-items:center;gap:6px;">Peso <input value="{{ r.weight }}" onChange="{{ r.onWeight }}" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;width:64px;background:#1e2630;border:1px solid #3d4a58;border-radius:8px;padding:9px 10px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+                  <span>Chance <b style="color:#f2f5f7;">{{ r.prob }}</b></span>
+                  <label style="display:flex;align-items:center;gap:6px;margin-left:auto;"><input type="checkbox" checked="{{ r.loss }}" onChange="{{ r.onLoss }}" style="width:18px;height:18px;accent-color:oklch(0.72 0.17 240);"> Perde</label>
+                </div>
               </div>
             </sc-for>
             <button onClick="{{ addWheel }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px dashed #3d4a58;background:transparent;color:#f2f5f7;border-radius:14px;padding:10px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">+ Adicionar prêmio</button>
@@ -641,18 +668,18 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
           <sc-for list="{{ orderFilters }}" as="of">
             <button onClick="{{ of.onClick }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:{{ of.bg }};color:{{ of.fg }};border-radius:14px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">{{ of.label }}</button>
           </sc-for>
-          <input value="{{ orderQ }}" onChange="{{ setOrderQ }}" placeholder="Buscar nome, telefone ou pedido" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1;min-width:200px;background:#26303b;border:1px solid #3d4a58;border-radius:10px;padding:10px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
+          <input value="{{ orderQ }}" onChange="{{ setOrderQ }}" placeholder="Buscar nome, telefone ou pedido" style="transition:border-color .18s ease,box-shadow .18s ease;flex:1 1 200px;background:#26303b;border:1px solid #3d4a58;border-radius:10px;padding:10px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);">
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;">
           <sc-if value="{{ noOrders }}"><span style="color:#9aa6b2;font-size:14px;">Nenhum pedido.</span></sc-if>
           <sc-for list="{{ orderRows }}" as="o">
             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#26303b;border:1px solid #34404d;border-radius:12px;padding:12px 14px;">
-              <div style="flex:1;min-width:180px;display:flex;flex-direction:column;gap:2px;">
+              <div style="flex:1 1 100%;min-width:0;display:flex;flex-direction:column;gap:2px;">
                 <span style="font-weight:800;font-size:14px;">{{ o.name }}</span>
                 <span style="font-size:12px;color:#9aa6b2;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;">{{ o.id }} · {{ o.phone }} · {{ o.date }}</span>
               </div>
-              <span style="font-size:14px;width:90px;">{{ o.qty }} tít.</span>
-              <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:14px;width:100px;">{{ o.total }}</span>
+              <span style="font-size:14px;">{{ o.qty }} cotas</span>
+              <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:14px;font-weight:700;">{{ o.total }}</span>
               <span style="font-size:12px;font-weight:800;padding:4px 8px;border-radius:7px;background:{{ o.stBg }};color:{{ o.stFg }};">{{ o.status }}</span>
               <div style="display:flex;gap:6px;">
                 <sc-if value="{{ o.isPending }}"><button onClick="{{ o.onConfirm }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:none;background:oklch(0.8 0.15 150);color:#0d1a10;border-radius:8px;padding:8px 10px;font-weight:800;font-size:12px;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Confirmar pgto</button></sc-if>
@@ -668,7 +695,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
           <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;">
             <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Apuração pela Loteria Federal</span>
             <span style="font-size:13px;color:#9aa6b2;line-height:1.5;">{{ fedRule }}</span>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;">
               <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Concurso<input value="{{ fedForm.concurso }}" onChange="{{ fed.concurso }}" inputMode="numeric" placeholder="ex: 5890" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
               <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">Data<input type="date" value="{{ fedForm.date }}" onChange="{{ fed.date }}" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;color-scheme:dark;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
               <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#9aa6b2;">1º prêmio<input value="{{ fedForm.p1 }}" onChange="{{ fed.p1 }}" inputMode="numeric" placeholder="5 dígitos" style="transition:border-color .18s ease,box-shadow .18s ease;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#f2f5f7;font-size:14px;outline:none;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
@@ -682,7 +709,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
               <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Resultado publicado</span>
               <sc-if value="{{ noRes }}"><span style="font-size:14px;color:#9aa6b2;">Nenhum resultado apurado ainda.</span></sc-if>
               <sc-if value="{{ hasRes }}">
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;">
                   <div style="background:#1e2630;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:11px;color:#9aa6b2;font-weight:700;text-transform:uppercase;">Número sorteado</span><span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:22px;font-weight:700;">{{ res.drawn }}</span></div>
                   <div style="background:#1e2630;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:11px;color:#9aa6b2;font-weight:700;text-transform:uppercase;">Contemplado</span><span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:22px;font-weight:700;color:oklch(0.72 0.17 240);">{{ res.winnerNumber }}</span></div>
                 </div>
@@ -755,6 +782,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
           <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:26px;font-weight:700;color:oklch(0.72 0.17 240);">{{ coTotal }}</span>
           <span style="font-size:13px;color:#9aa6b2;">expira em <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;color:#f2f5f7;font-weight:700;">{{ pixTimer }}</span></span>
         </div>
+        <sc-if value="{{ pixOk }}" hint-placeholder-val="{{ true }}">
         <div style="width:210px;height:210px;margin:0 auto;border-radius:12px;background:#f2f5f7;padding:8px;display:flex;align-items:center;justify-content:center;">
           <sc-if value="{{ hasQr }}"><img src="{{ qrSrc }}" alt="QR code PIX" style="width:100%;height:100%;image-rendering:pixelated;"></sc-if>
           <sc-if value="{{ noQr }}"><span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;font-size:12px;color:#ffffff;">QR code PIX</span></sc-if>
@@ -764,8 +792,16 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
           <input readOnly="{{ true }}" value="{{ pixCode }}" style="flex:1;min-width:0;background:#1e2630;border:1px solid #3d4a58;border-radius:10px;padding:11px 12px;color:#9aa6b2;font-size:12px;font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;outline:none;">
           <button onClick="{{ copyPix }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:#2e3946;color:#f2f5f7;border-radius:14px;padding:0 14px;font-weight:800;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">Copiar</button>
         </div>
+        </sc-if>
+        <sc-if value="{{ pixFail }}">
+          <div style="background:#1e2630;border:1px solid #4a2a26;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px;">
+            <span style="font-size:14px;font-weight:700;color:oklch(0.75 0.16 25);">Não foi possível gerar o PIX</span>
+            <span style="font-size:12px;color:#9aa6b2;font-family:monospace;word-break:break-word;">{{ pixErrMsg }}</span>
+          </div>
+          <a href="https://wa.me/558197399489" target="_blank" style="text-align:center;font-size:14px;font-weight:700;">Falar com o suporte no WhatsApp</a>
+        </sc-if>
         <div style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:700;color:{{ pixStatusColor }};"><span style="width:8px;height:8px;border-radius:50%;background:{{ pixStatusColor }};animation:xcpulse 1.4s infinite;"></span>{{ pixStatus }}</div>
-        <button onClick="{{ simulatePay }}" style="border:none;border-radius:14px;padding:16px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));color:#ffffff;font-size:15px;font-weight:800;cursor:pointer;transition:transform .18s ease,filter .18s ease;" style-hover="transform:translateY(-2px);filter:brightness(1.08);" style-active="transform:scale(.97);">Já paguei</button>
+        <button onClick="{{ simulatePay }}" style="border:none;border-radius:14px;padding:16px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));color:#ffffff;font-size:15px;font-weight:800;cursor:pointer;transition:transform .18s ease,filter .18s ease;" style-hover="transform:translateY(-2px);filter:brightness(1.08);" style-active="transform:scale(.97);">{{ paidBtnLabel }}</button>
         <span style="font-size:12px;color:#9aa6b2;">Pedido {{ coOrderId }} reservado. Você também pode pagar depois em Meus títulos.</span>
       </sc-if>
 
@@ -918,17 +954,29 @@ class Component extends DCLogic {
   async loadPix(o) {
     try {
       const { data, error } = await this.sb.functions.invoke('mp-pix', { body: { order_id: o.id } });
-      if (error || !data || !data.qr_code) throw error || new Error('sem qr');
+      if (error) {
+        let msg = error.message || 'Erro';
+        try { const j = await error.context.json(); msg = j.error || JSON.stringify(j); } catch (x) { try { msg = await error.context.text(); } catch (y) {} }
+        throw new Error(msg);
+      }
+      if (!data || !data.qr_code) throw new Error((data && data.error) || 'Resposta sem QR code');
       this.setState({ pix: { code: data.qr_code, qr: data.qr_code_base64 } });
-    } catch (e) { this.setState({ pix: { err: true } }); }
+    } catch (e) { this.setState({ pix: { err: true, msg: String((e && e.message) || e) } }); }
   }
   async checkPay(id, silent) {
-    const { data } = await this.sb.rpc('order_status', { p_order: id });
+    if (!silent) { if (this._checking) return; this._checking = true; this.setState({ checking: true }); }
+    let mp = null;
+    try { const r = await this.sb.functions.invoke('mp-pix', { body: { order_id: id, check: true } }); mp = r.data; } catch (e) {}
+    const { data, error } = await this.sb.rpc('order_status', { p_order: id });
+    if (!silent) { this._checking = false; this.setState({ checking: false }); }
+    if (error) { if (!silent) this.toast('Erro ao verificar: ' + error.message); return; }
     if (data && data.status === 'paid') {
       clearInterval(this._payT);
       this.setState(s => ({ co: s.co ? { step: 'done', order: { ...s.co.order, status: 'paid' }, numbers: data.numbers || [] } : s.co }));
       this.loadPublicStats();
-    } else if (!silent) this.toast('Ainda não identificamos o pagamento. Aguarde alguns segundos.');
+    } else if (!silent) {
+      this.toast(mp && mp.status === 'approved' ? 'Pagamento aprovado! Gerando seus números…' : 'O PIX ainda não caiu. Assim que cair, esta tela atualiza sozinha.');
+    }
   }
   async doSearch(raw) {
     const ph = Component.digits(raw);
@@ -1022,6 +1070,29 @@ class Component extends DCLogic {
     if (error) return this.err(error);
     this.setState({ campRow: data, camp: Component.toC(data), cEdit: Component.toC(data), dirty: false });
     this.toast('Alterações salvas');
+  }
+  async uploadImages(files) {
+    files = Array.from(files || []).filter(f => f.type.startsWith('image/'));
+    if (!files.length || !this.state.campRow) return;
+    this.setState(s => ({ uploading: (s.uploading || 0) + files.length }));
+    const shrink = f => new Promise(res => {
+      const img = new Image(), url = URL.createObjectURL(f);
+      img.onload = () => { const m = 1600, k = Math.min(1, m / Math.max(img.width, img.height)), cv = document.createElement('canvas'); cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k); cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(url); cv.toBlob(b => res(b || f), 'image/jpeg', 0.85); };
+      img.onerror = () => { URL.revokeObjectURL(url); res(f); };
+      img.src = url;
+    });
+    for (const f of files) {
+      try {
+        const blob = await shrink(f);
+        const b64 = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(',')[1]); fr.onerror = rej; fr.readAsDataURL(blob); });
+        const { data, error } = await this.sb.functions.invoke('github-upload', { body: { campaign_id: this.state.campRow.id, content_base64: b64 } });
+        if (error || !data || !data.url) throw (data && data.error) ? new Error(data.error) : (error || new Error('Falha ao enviar'));
+        this._preview = this._preview || {}; this._preview[data.url] = URL.createObjectURL(blob);
+        this.setState(s => { const list = String(s.cEdit.imagesRaw || '').split('\n').map(x => x.trim()).filter(Boolean); return { cEdit: { ...s.cEdit, imagesRaw: [...list, data.url].join('\n') }, dirty: true }; });
+      } catch (e) { this.err(e, 'Falha ao enviar a foto'); }
+      this.setState(s => ({ uploading: Math.max(0, (s.uploading || 1) - 1) }));
+    }
+    this.toast('Fotos enviadas ao GitHub. Clique em Salvar; elas aparecem no site em ~1 minuto.');
   }
   setC(patch) { this.setState(s => ({ cEdit: { ...s.cEdit, ...patch }, dirty: true })); }
   async addPN() {
@@ -1235,6 +1306,8 @@ class Component extends DCLogic {
       setFPhone: e => this.setState({ form: { ...s.form, phone: C.fmtPhone(e.target.value) } }),
       setFTerms: e => this.setState({ form: { ...s.form, terms: e.target.checked } }),
       coTotal: coOrder ? C.brl(coOrder.total) : '', coOrderId: coOrder ? coOrder.id : '', pixTimer, pixCode, qrSrc: qrSrc || '', hasQr: !!qrSrc, noQr: !qrSrc,
+      paidBtnLabel: s.checking ? 'Verificando pagamento…' : 'Já paguei',
+      pixOk: !s.pix.err, pixFail: !!s.pix.err, pixErrMsg: s.pix.msg || '',
       pixStatus: s.pix.loading ? 'Gerando seu PIX…' : s.pix.err ? 'PIX automático indisponível. Fale com o suporte.' : 'Aguardando pagamento…',
       pixStatusColor: s.pix.err ? 'oklch(0.75 0.16 25)' : 'oklch(0.85 0.13 75)',
       copyPix: () => { if (!pixCode) return; navigator.clipboard && navigator.clipboard.writeText(pixCode); this.toast('Código PIX copiado'); },
@@ -1266,6 +1339,11 @@ class Component extends DCLogic {
       recentOrders: aOrders.slice(0, 6).map(o => ({ name: o.name, qty: o.qty, total: C.brl(o.total), ...st(o) })),
       showSave: isAdm && s.adm && s.dirty, saveCampaign: () => this.saveCampaign(), saving: s.saving, saveLabel: s.saving ? 'Salvando…' : 'Salvar',
       discardChanges: () => this.setState({ cEdit: row ? C.toC(row) : null, dirty: false }),
+      adminImgs: images.map((src, i) => ({ src: (this._preview && this._preview[src]) || src, isCover: i === 0, border: i === 0 ? 'oklch(0.72 0.17 240)' : '#34404d',
+        onRemove: () => this.setC({ imagesRaw: images.filter((_, j) => j !== i).join('\n') }),
+        onLeft: () => { if (i === 0) return; const a = images.slice(); [a[i - 1], a[i]] = [a[i], a[i - 1]]; this.setC({ imagesRaw: a.join('\n') }); } })),
+      uploadLabel: s.uploading ? `Enviando ${s.uploading}…` : 'Adicionar fotos',
+      onPickImages: e => { const fl = e.target.files; this.uploadImages(fl); e.target.value = ''; },
       f: fields, setRankingOn: e => this.setC({ rankingOn: e.target.checked }),
       comboRows: (c.combos || []).map((x, i) => ({ qty: x.qty, price: x.price, onQty: e => updArr('combos', i, { qty: e.target.value }), onPrice: e => updArr('combos', i, { price: e.target.value }), onRemove: () => rmArr('combos', i) })),
       addCombo: () => this.setC({ combos: [...(c.combos || []), { qty: '', price: '' }] }),
