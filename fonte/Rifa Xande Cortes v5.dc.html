@@ -31,6 +31,10 @@ input,textarea,select,button{font-family:inherit}
 button:disabled{cursor:not-allowed!important;opacity:.6}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 @keyframes xcpulse{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes xcbulb{0%,100%{opacity:1;box-shadow:0 0 6px #fff,0 0 14px currentColor}50%{opacity:.35;box-shadow:0 0 2px currentColor}}
+@keyframes xcglow{0%,100%{box-shadow:0 0 18px oklch(0.75 0.2 330 / .7),0 0 46px oklch(0.7 0.18 240 / .55),inset 0 0 18px oklch(0.75 0.2 330 / .5)}50%{box-shadow:0 0 28px oklch(0.85 0.17 195 / .85),0 0 70px oklch(0.75 0.2 330 / .6),inset 0 0 24px oklch(0.85 0.17 195 / .6)}}
+@keyframes xcpop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+@keyframes xcconf{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(540deg);opacity:0}}
 @keyframes xcstripe{from{background-position:0 0}to{background-position:28.28px 0}}
 </style>
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1e2630"/><circle cx="50" cy="50" r="30" fill="#1e96f0"/><text x="50" y="58" font-family="sans-serif" font-size="22" font-weight="800" fill="#fff" text-anchor="middle">XC</text></svg></template>
@@ -342,16 +346,36 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
           <span style="color:#9aa6b2;font-size:14px;">{{ wheelRule }}</span>
           <sc-if value="{{ wheelEmpty }}"><div style="margin-top:8px;background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;font-size:14px;color:#c9d1d9;">A roleta ainda não foi configurada para esta campanha.</div></sc-if>
         </div>
-        <div style="position:relative;width:min(300px,80vw);aspect-ratio:1/1;margin:8px auto;">
-          <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:26px solid #f2f5f7;z-index:3;"></div>
-          <div style="width:100%;height:100%;border-radius:50%;border:6px solid #34404d;background:{{ wheelBg }};transform:rotate({{ wDeg }}deg);transition:transform 4.3s cubic-bezier(.15,.7,.15,1);position:relative;overflow:hidden;">
+        <div style="position:relative;width:min(340px,86vw);aspect-ratio:1/1;margin:18px auto 8px;">
+          <div style="position:absolute;inset:-14px;border-radius:50%;background:radial-gradient(circle,oklch(0.25 0.08 300) 60%,oklch(0.16 0.05 280) 100%);border:3px solid oklch(0.8 0.2 330);animation:xcglow 2.4s ease-in-out infinite;"></div>
+          <sc-for list="{{ wheelBulbs }}" as="bb">
+            <span style="position:absolute;left:50%;top:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:#fff;color:{{ bb.color }};transform:rotate({{ bb.angle }}deg) translateY(calc(-1 * (min(170px,43vw) + 7px)));animation:xcbulb {{ bb.speed }}s ease-in-out {{ bb.delay }}s infinite;z-index:2;"></span>
+          </sc-for>
+          <div style="position:absolute;top:-26px;left:50%;transform:translateX(-50%);z-index:4;display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 0 8px oklch(0.85 0.17 195)) drop-shadow(0 0 16px oklch(0.85 0.17 195));">
+            <div style="width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffffff,oklch(0.85 0.17 195));border:3px solid #0d1020;"></div>
+            <div style="width:0;height:0;margin-top:-6px;border-left:15px solid transparent;border-right:15px solid transparent;border-top:30px solid oklch(0.85 0.17 195);"></div>
+          </div>
+          <div ref="{{ wheelRef }}" style="position:absolute;inset:0;border-radius:50%;border:5px solid #0d1020;background:{{ wheelBg }};transform:rotate({{ wDeg }}deg);transition:transform 5.2s cubic-bezier(.12,.72,.12,1);overflow:hidden;box-shadow:inset 0 0 0 3px rgba(255,255,255,.25),inset 0 0 40px rgba(0,0,0,.45);">
             <sc-for list="{{ wheelLabels }}" as="w">
               <div style="position:absolute;inset:0;transform:rotate({{ w.angle }}deg);display:flex;justify-content:center;pointer-events:none;">
-                <span style="writing-mode:vertical-rl;padding-top:14px;max-height:38%;overflow:hidden;font-size:12px;font-weight:800;text-transform:uppercase;color:{{ w.fg }};">{{ w.label }}</span>
+                <span style="writing-mode:vertical-rl;padding-top:16px;max-height:40%;overflow:hidden;font-size:13px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:{{ w.fg }};text-shadow:0 1px 2px rgba(0,0,0,.45);">{{ w.label }}</span>
               </div>
             </sc-for>
+            <div style="position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 50% 30%,rgba(255,255,255,.28),transparent 55%);pointer-events:none;"></div>
           </div>
-          <div style="position:absolute;top:50%;left:50%;width:54px;height:54px;transform:translate(-50%,-50%);border-radius:50%;background:#1e2630;border:4px solid #f2f5f7;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">XC</div>
+          <div style="position:absolute;top:50%;left:50%;width:70px;height:70px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 35% 30%,#2b3550,#0d1020);border:4px solid oklch(0.88 0.16 90);box-shadow:0 0 14px oklch(0.88 0.16 90 / .8),0 0 30px oklch(0.88 0.16 90 / .4);display:flex;align-items:center;justify-content:center;z-index:3;overflow:hidden;">
+            <img src="logo-xc.png" alt="XC" style="width:82%;height:auto;display:block;">
+          </div>
+          <sc-if value="{{ showConfetti }}">
+            <div style="position:absolute;left:50%;top:50%;width:0;height:0;z-index:6;pointer-events:none;">
+              <sc-for list="{{ confetti }}" as="cf">
+                <span style="position:absolute;width:9px;height:14px;border-radius:2px;background:{{ cf.color }};--dx:{{ cf.dx }}px;--dy:{{ cf.dy }}px;animation:xcconf 1.6s cubic-bezier(.2,.7,.3,1) {{ cf.delay }}s forwards;"></span>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+        <div style="display:flex;justify-content:center;">
+          <button onClick="{{ toggleSound }}" style="border:1px solid #3d4a58;background:transparent;color:#c9d1d9;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;" style-hover="border-color:oklch(0.8 0.2 330);color:#fff;">{{ soundLabel }}</button>
         </div>
         <sc-if value="{{ wNotLogged }}" hint-placeholder-val="{{ true }}">
           <div style="display:flex;gap:8px;">
@@ -364,9 +388,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
             <span style="color:#9aa6b2;">{{ wPhoneLabel }} · <a href="#" onClick="{{ wLogout }}">trocar</a></span>
             <span style="font-weight:800;">Giros: <span style="font-family:Montserrat,sans-serif;font-variant-numeric:tabular-nums;color:oklch(0.72 0.17 240);font-size:18px;">{{ spinsLeft }}</span></span>
           </div>
-          <button onClick="{{ spin }}" disabled="{{ spinDisabled }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;width:100%;border:none;border-radius:14px;padding:18px;background:linear-gradient(180deg,oklch(0.7 0.17 240),oklch(0.58 0.19 252));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px oklch(0.6 0.19 248 / .35);color:#ffffff;font-size:17px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">{{ spinLabel }}</button>
+          <button onClick="{{ spin }}" disabled="{{ spinDisabled }}" style="transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;width:100%;border:none;border-radius:16px;padding:19px;background:linear-gradient(90deg,oklch(0.68 0.24 330),oklch(0.62 0.2 290),oklch(0.7 0.17 240));box-shadow:0 0 18px oklch(0.68 0.24 330 / .55),0 0 36px oklch(0.7 0.17 240 / .35),inset 0 1px 0 rgba(255,255,255,.35);color:#ffffff;font-size:18px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.06) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 12px 28px oklch(0.6 0.19 248 / .5);" style-active="transform:scale(.96);filter:brightness(.95);">{{ spinLabel }}</button>
           <sc-if value="{{ hasResult }}">
-            <div style="text-align:center;border-radius:14px;padding:16px;background:{{ resultBg }};color:{{ resultFg }};font-weight:800;font-size:18px;">{{ resultText }}</div>
+            <div style="text-align:center;border-radius:16px;padding:18px;background:{{ resultBg }};color:{{ resultFg }};font-weight:900;font-size:20px;box-shadow:{{ resultGlow }};animation:xcpop .5s ease-out;">{{ resultText }}</div>
           </sc-if>
           <sc-if value="{{ hasMyWins }}">
             <div style="display:flex;flex-direction:column;gap:6px;">
@@ -703,6 +727,46 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 
       <sc-if value="{{ tRoleta }}">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:16px;align-items:start;">
+          <div style="background:linear-gradient(165deg,#1d1838,#121528);border:1px solid oklch(0.5 0.15 300);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px;grid-column:1/-1;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:oklch(0.85 0.15 330);">Testar roleta</span>
+              <span style="font-size:11px;font-weight:700;color:#9aa6b2;">Só teste · não gasta giro nem salva nada</span>
+            </div>
+            <div style="position:relative;width:min(260px,74vw);aspect-ratio:1/1;margin:18px auto 4px;">
+              <div style="position:absolute;inset:-10px;border-radius:50%;border:3px solid oklch(0.8 0.2 330);animation:xcglow 2.4s ease-in-out infinite;"></div>
+              <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);z-index:4;filter:drop-shadow(0 0 8px oklch(0.85 0.17 195));width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:26px solid oklch(0.85 0.17 195);"></div>
+              <div ref="{{ testWheelRef }}" style="position:absolute;inset:0;border-radius:50%;border:5px solid #0d1020;background:{{ tWheelBg }};transform:rotate({{ tDeg }}deg);transition:transform 5.2s cubic-bezier(.12,.72,.12,1);overflow:hidden;box-shadow:inset 0 0 0 3px rgba(255,255,255,.25),inset 0 0 40px rgba(0,0,0,.45);">
+                <sc-for list="{{ tWheelLabels }}" as="w">
+                  <div style="position:absolute;inset:0;transform:rotate({{ w.angle }}deg);display:flex;justify-content:center;pointer-events:none;">
+                    <span style="writing-mode:vertical-rl;padding-top:12px;max-height:40%;overflow:hidden;font-size:11px;font-weight:900;text-transform:uppercase;color:{{ w.fg }};text-shadow:0 1px 2px rgba(0,0,0,.45);">{{ w.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="position:absolute;top:50%;left:50%;width:54px;height:54px;transform:translate(-50%,-50%);border-radius:50%;background:#0d1020;border:3px solid oklch(0.88 0.16 90);box-shadow:0 0 12px oklch(0.88 0.16 90 / .7);display:flex;align-items:center;justify-content:center;z-index:3;overflow:hidden;"><img src="logo-xc.png" alt="XC" style="width:82%;height:auto;display:block;"></div>
+            </div>
+            <sc-if value="{{ tHasResult }}">
+              <div style="text-align:center;border-radius:14px;padding:14px;background:{{ tResultBg }};color:{{ tResultFg }};font-weight:900;font-size:17px;animation:xcpop .5s ease-out;">{{ tResultText }}</div>
+            </sc-if>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button onClick="{{ tSpin }}" disabled="{{ tSpinDisabled }}" style="flex:1 1 160px;border:none;border-radius:14px;padding:14px;background:linear-gradient(90deg,oklch(0.68 0.24 330),oklch(0.62 0.2 290),oklch(0.7 0.17 240));box-shadow:0 0 16px oklch(0.68 0.24 330 / .5);color:#ffffff;font-size:15px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;font-family:inherit;transition:transform .18s ease,filter .18s ease;" style-hover="transform:translateY(-2px);filter:brightness(1.1);" style-active="transform:scale(.97);">{{ tSpinLabel }}</button>
+              <button onClick="{{ tSimulate }}" disabled="{{ tSpinDisabled }}" style="flex:1 1 160px;border:1px solid #3d4a58;background:transparent;color:#f2f5f7;border-radius:14px;padding:14px;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;transition:transform .18s ease,border-color .18s ease;" style-hover="transform:translateY(-2px);border-color:oklch(0.8 0.2 330);">Simular 1.000 giros</button>
+            </div>
+            <span style="font-size:12px;color:#9aa6b2;line-height:1.5;">Usa as chances que estão na tela agora, mesmo antes de salvar. O giro de verdade dos clientes é sorteado no servidor com as mesmas porcentagens.</span>
+            <sc-if value="{{ tHasSim }}">
+              <div style="display:flex;flex-direction:column;gap:8px;background:#121528;border:1px solid #2e2a4d;border-radius:12px;padding:12px;">
+                <span style="font-size:12px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">{{ tSimTitle }}</span>
+                <sc-for list="{{ tSimRows }}" as="sr">
+                  <div style="display:flex;flex-direction:column;gap:4px;">
+                    <div style="display:flex;justify-content:space-between;gap:8px;font-size:13px;">
+                      <span style="font-weight:700;display:flex;align-items:center;gap:6px;min-width:0;"><span style="width:10px;height:10px;border-radius:3px;flex:none;background:{{ sr.color }};"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ sr.label }}</span></span>
+                      <span style="font-variant-numeric:tabular-nums;color:#c9d1d9;white-space:nowrap;">{{ sr.count }} · <b style="color:#f2f5f7;">{{ sr.real }}</b> <span style="color:#7a8692;">(config. {{ sr.cfg }})</span></span>
+                    </div>
+                    <div style="height:6px;background:#1e2238;border-radius:999px;overflow:hidden;"><div style="height:100%;width:{{ sr.w }}%;background:{{ sr.color }};box-shadow:0 0 8px {{ sr.color }};"></div></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
           <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;">
             <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Prêmios da roleta</span>
             <sc-for list="{{ wheelRows }}" as="r">
@@ -713,14 +777,21 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
                   <button onClick="{{ r.onRemove }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px solid #3d4a58;background:transparent;color:#9aa6b2;border-radius:8px;width:36px;height:36px;flex:none;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">✕</button>
                 </div>
                 <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px;color:#9aa6b2;">
-                  <label style="display:flex;align-items:center;gap:6px;">Peso <input value="{{ r.weight }}" onChange="{{ r.onWeight }}" inputMode="numeric" style="transition:border-color .18s ease,box-shadow .18s ease;width:64px;background:#1e2630;border:1px solid #3d4a58;border-radius:8px;padding:9px 10px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
-                  <span>Chance <b style="color:#f2f5f7;">{{ r.prob }}</b></span>
+                  <label style="display:flex;align-items:center;gap:6px;">Chance <input value="{{ r.weight }}" onChange="{{ r.onWeight }}" inputMode="decimal" placeholder="0" style="transition:border-color .18s ease,box-shadow .18s ease;width:72px;background:#1e2630;border:1px solid #3d4a58;border-radius:8px;padding:9px 10px;color:#f2f5f7;font-size:14px;outline:none;" style-focus="border-color:oklch(0.72 0.17 240);box-shadow:0 0 0 3px oklch(0.8 0.15 75 / .18);"></label>
+                  <span style="font-weight:800;color:#f2f5f7;">%</span>
                   <label style="display:flex;align-items:center;gap:6px;margin-left:auto;"><input type="checkbox" checked="{{ r.loss }}" onChange="{{ r.onLoss }}" style="width:18px;height:18px;accent-color:oklch(0.72 0.17 240);"> Perde</label>
                 </div>
               </div>
             </sc-for>
             <button onClick="{{ addWheel }}" style="transition:transform .18s ease,filter .18s ease,background-color .18s ease,border-color .18s ease,box-shadow .18s ease;border:1px dashed #3d4a58;background:transparent;color:#f2f5f7;border-radius:14px;padding:10px;font-weight:700;cursor:pointer;" style-hover="transform:translateY(-2px);filter:brightness(1.08);border-color:oklch(0.72 0.17 240);box-shadow:0 8px 20px rgba(0,0,0,.35);" style-active="transform:scale(.96);filter:brightness(.95);">+ Adicionar prêmio</button>
-            <span style="font-size:12px;color:#9aa6b2;">Peso maior = mais chance. Marque "Perde" nas casas sem prêmio. O giro por títulos é definido na aba Campanha.</span>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:#1e2630;border:1px solid {{ wTotalColor }};border-radius:12px;padding:12px;">
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <span style="font-size:13px;font-weight:800;">Total: <span style="color:{{ wTotalColor }};font-variant-numeric:tabular-nums;">{{ wTotalLabel }}</span></span>
+                <span style="font-size:12px;color:#9aa6b2;">{{ wTotalMsg }}</span>
+              </div>
+              <button onClick="{{ wEqual }}" style="border:1px solid #3d4a58;background:transparent;color:#f2f5f7;border-radius:12px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;" style-hover="border-color:oklch(0.72 0.17 240);">Dividir igual</button>
+            </div>
+            <span style="font-size:12px;color:#9aa6b2;line-height:1.5;">Defina a chance de cada casa em %. A soma precisa dar 100%. Ex.: R$ 50 = 5%, R$ 10 = 15%, Tente de novo = 80%. Marque "Perde" nas casas sem prêmio. O giro por títulos é definido na aba Campanha.</span>
           </div>
           <div style="background:#26303b;border:1px solid #34404d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px;">
             <span style="font-size:13px;font-weight:800;text-transform:uppercase;color:#9aa6b2;">Histórico de giros</span>
@@ -1038,7 +1109,8 @@ class Component extends DCLogic {
     wInput: '', wPhone: '', wDeg: 0, spinning: false, wResult: null, spinsLeft: 0, myWins: [],
     adm: false, email: '', pass: '', passErr: '', authBusy: false, tab: 'geral', aLoading: false,
     cEdit: null, dirty: false, saving: false, aOrders: [], aSpins: [], lastSync: 0,
-    aCamps: [], aSold: {}, admCampId: null, upsell: false, openNums: {}, newPN: { number: '', prize: '' }, orderF: 'todos', orderQ: '', lookup: '', lookupRes: null,
+    tDeg: 0, tSpinning: false, tResult: null, tSim: null,
+    soundOn: (() => { try { return localStorage.getItem('xc_sound') !== '0'; } catch (e) { return true; } })(), aCamps: [], aSold: {}, admCampId: null, upsell: false, openNums: {}, newPN: { number: '', prize: '' }, orderF: 'todos', orderQ: '', lookup: '', lookupRes: null,
     fedForm: { concurso: '', date: '', p1: '', p2: '' }, toast: '',
     menu: false, dMode: null, installHelp: false, appHidden: localStorage.getItem('xc_app') === '0',
     cookie: localStorage.getItem('xc_cookie') === '1', age: localStorage.getItem('xc_18') || ''
@@ -1161,6 +1233,61 @@ class Component extends DCLogic {
     const { data } = await this.sb.rpc('spins_left', { p_campaign: r.id, p_phone: ph });
     this.setState({ wPhone: ph, spinsLeft: data || 0, wResult: null, myWins: [] });
   }
+  wheelRef = React.createRef();
+  sfx(kind) {
+    if (!this.state.soundOn) return;
+    try {
+      const A = this._ac || (this._ac = new (window.AudioContext || window.webkitAudioContext)());
+      if (A.state === 'suspended') A.resume();
+      const t = A.currentTime;
+      const tone = (f, at, dur, type, vol, f2) => { const o = A.createOscillator(), g = A.createGain(); o.type = type; o.frequency.setValueAtTime(f, t + at); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + at + dur); g.gain.setValueAtTime(0.0001, t + at); g.gain.exponentialRampToValueAtTime(vol, t + at + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + at + dur); o.connect(g).connect(A.destination); o.start(t + at); o.stop(t + at + dur + 0.02); };
+      if (kind === 'tick') tone(1800, 0, 0.035, 'square', 0.06);
+      else if (kind === 'start') { tone(220, 0, 0.35, 'sawtooth', 0.08, 880); }
+      else if (kind === 'win') { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.11, 0.28, 'triangle', 0.18)); [1319, 1568, 2093].forEach((f, i) => tone(f, 0.5 + i * 0.07, 0.2, 'sine', 0.08)); }
+      else if (kind === 'loss') { tone(392, 0, 0.25, 'triangle', 0.14, 330); tone(311, 0.22, 0.45, 'triangle', 0.14, 220); }
+    } catch (e) {}
+  }
+  trackTicks(n, ref) {
+    ref = ref || this.wheelRef;
+    cancelAnimationFrame(this._tickRaf);
+    const seg = 360 / Math.max(1, n); let last = null; const t0 = performance.now();
+    const loop = () => {
+      const el = ref.current; if (!el) return;
+      const tr = getComputedStyle(el).transform; let ang = 0;
+      if (tr && tr !== 'none') { const m = tr.match(/matrix\(([^)]+)\)/); if (m) { const [a, b] = m[1].split(',').map(Number); ang = (Math.atan2(b, a) * 180 / Math.PI + 360) % 360; } }
+      const idx = Math.floor(ang / seg);
+      if (last !== null && idx !== last) this.sfx('tick');
+      last = idx;
+      if (performance.now() - t0 < 5300) this._tickRaf = requestAnimationFrame(loop);
+    };
+    this._tickRaf = requestAnimationFrame(loop);
+  }
+  testWheelRef = React.createRef();
+  tPick(list) {
+    const tot = list.reduce((a, w) => a + Math.max(0, Component.num(w.weight)), 0);
+    if (tot <= 0) return Math.floor(Math.random() * list.length);
+    let r = Math.random() * tot;
+    for (let i = 0; i < list.length; i++) { r -= Math.max(0, Component.num(list[i].weight)); if (r < 0) return i; }
+    return list.length - 1;
+  }
+  tList() { return ((this.state.cEdit && this.state.cEdit.wheel) || []).filter(w => String(w.label).trim()); }
+  testSpin() {
+    const list = this.tList(), s = this.state;
+    if (s.tSpinning || list.length < 2) return list.length < 2 && this.toast('Adicione pelo menos 2 casas na roleta');
+    const idx = this.tPick(list), seg = 360 / list.length, center = idx * seg + seg / 2 + (Math.random() - 0.5) * seg * 0.6;
+    const cur = ((s.tDeg % 360) + 360) % 360, delta = ((360 - center - cur) % 360 + 360) % 360;
+    this.sfx('start');
+    this.setState({ tSpinning: true, tResult: null, tDeg: s.tDeg + 2160 + delta });
+    this.trackTicks(list.length, this.testWheelRef);
+    setTimeout(() => this.sfx(list[idx].loss ? 'loss' : 'win'), 5250);
+    setTimeout(() => this.setState({ tSpinning: false, tResult: { label: list[idx].label, loss: !!list[idx].loss } }), 5300);
+  }
+  testSimulate() {
+    const list = this.tList(); if (list.length < 2) return this.toast('Adicione pelo menos 2 casas na roleta');
+    const N = 1000, cnt = list.map(() => 0);
+    for (let i = 0; i < N; i++) cnt[this.tPick(list)]++;
+    this.setState({ tSim: { n: N, cnt } });
+  }
   async doSpin() {
     const s = this.state, wheel = (s.camp && s.camp.wheel) || [];
     if (s.spinning || wheel.length < 2 || s.spinsLeft <= 0) return;
@@ -1169,8 +1296,11 @@ class Component extends DCLogic {
     if (error) { this.setState({ spinning: false }); return this.err(error); }
     const seg = 360 / wheel.length, center = data.index * seg + seg / 2 + (Math.random() - 0.5) * seg * 0.6;
     const cur = ((s.wDeg % 360) + 360) % 360, delta = ((360 - center - cur) % 360 + 360) % 360;
-    this.setState({ wDeg: s.wDeg + 1800 + delta });
-    setTimeout(() => this.setState(st => ({ spinning: false, wResult: { label: data.label, loss: data.loss }, spinsLeft: data.left, myWins: data.loss ? st.myWins : [{ label: data.label, at: Date.now() }, ...st.myWins] })), 4400);
+    this.sfx('start');
+    this.setState({ wDeg: s.wDeg + 2160 + delta });
+    this.trackTicks(wheel.length);
+    setTimeout(() => this.sfx(data.loss ? 'loss' : 'win'), 5250);
+    setTimeout(() => this.setState(st => ({ spinning: false, wResult: { label: data.label, loss: data.loss }, spinsLeft: data.left, myWins: data.loss ? st.myWins : [{ label: data.label, at: Date.now() }, ...st.myWins] })), 5300);
   }
 
   async login() {
@@ -1242,6 +1372,8 @@ class Component extends DCLogic {
     this.toast('Rifa criada. Configure os detalhes e salve.');
   }
   async saveCampaign() {
+    { const wl = ((this.state.cEdit && this.state.cEdit.wheel) || []).filter(w => String(w.label).trim()); const tot = wl.reduce((a, w) => a + Math.max(0, Component.num(w.weight)), 0);
+      if (wl.length && Math.abs(tot - 100) > 0.01) { this.setState({ tab: 'roleta' }); return this.toast(`As chances da roleta somam ${String(Math.round(tot * 100) / 100).replace('.', ',')}%. Ajuste para 100% antes de salvar.`); } }
     const s = this.state, row = Component.fromC(s.cEdit);
     if (!row.title) return this.toast('Informe o título');
     if (!(row.price > 0)) return this.toast('Informe o valor de cada cota');
@@ -1384,10 +1516,13 @@ class Component extends DCLogic {
     }));
 
     const n = wheel.length || 1, seg = 360 / n;
-    const segCol = i => wheel[i].loss ? '#34404d' : (i % 2 ? '#f2f5f7' : 'oklch(0.72 0.17 240)');
-    const segFg = i => wheel[i].loss ? '#9aa6b2' : (i % 2 ? '#0b2b52' : '#ffffff');
-    const wheelBg = wheel.length ? `conic-gradient(${wheel.map((w, i) => `${segCol(i)} ${i * seg}deg ${(i + 1) * seg}deg`).join(',')})` : '#2e3946';
+    const NEON = ['oklch(0.66 0.26 350)', 'oklch(0.85 0.17 90)', 'oklch(0.72 0.19 240)', 'oklch(0.8 0.22 145)', 'oklch(0.62 0.25 300)', 'oklch(0.78 0.18 55)', 'oklch(0.82 0.15 195)', 'oklch(0.64 0.24 25)'];
+    const NEON_FG = ['#ffffff', '#2a1d00', '#ffffff', '#062010', '#ffffff', '#2a1200', '#04232a', '#ffffff'];
+    const segCol = i => wheel[i].loss ? '#1b2033' : NEON[i % NEON.length];
+    const segFg = i => wheel[i].loss ? '#8f9bd0' : NEON_FG[i % NEON.length];
+    const wheelBg = wheel.length ? `repeating-conic-gradient(from 0deg, rgba(255,255,255,.9) 0deg .6deg, transparent .6deg ${seg}deg), conic-gradient(${wheel.map((w, i) => `${segCol(i)} ${i * seg}deg ${(i + 1) * seg}deg`).join(',')})` : 'conic-gradient(oklch(0.66 0.26 350),oklch(0.85 0.17 90),oklch(0.72 0.19 240),oklch(0.8 0.22 145),oklch(0.66 0.26 350))';
     const wSum = wheel.reduce((a, w) => a + Math.max(0, C.num(w.weight)), 0) || 1;
+    const wTotal = Math.round(wheel.reduce((a, w) => a + Math.max(0, C.num(w.weight)), 0) * 100) / 100;
 
     const winners = [
       ...s.prizesOut.map(x => ({ name: x.name, prize: prizeSet.get(x.number) || 'Cota premiada', type: 'Cota premiada', number: pad(x.number), typeColor: 'oklch(0.8 0.15 150)', at: 1 })),
@@ -1508,6 +1643,30 @@ class Component extends DCLogic {
       spinLabel: s.spinning ? 'Girando…' : s.spinsLeft > 0 ? 'Girar roleta' : 'Sem giros. Compre cotas',
       hasResult: !!s.wResult && !s.spinning, resultBg: s.wResult && !s.wResult.loss ? 'oklch(0.8 0.15 150)' : '#2e3946', resultFg: s.wResult && !s.wResult.loss ? '#0d1a10' : '#f2f5f7',
       resultText: s.wResult ? (s.wResult.loss ? s.wResult.label : `Você ganhou: ${s.wResult.label}!`) : '',
+      resultGlow: s.wResult && !s.wResult.loss ? '0 0 22px oklch(0.8 0.22 145 / .8),0 0 50px oklch(0.8 0.22 145 / .4)' : 'none',
+      testWheelRef: this.testWheelRef, tDeg: s.tDeg,
+      ...(() => {
+        const tl = ((s.cEdit && s.cEdit.wheel) || []).filter(w => String(w.label).trim()), tn = tl.length || 1, ts = 360 / tn;
+        const col = i => tl[i].loss ? '#1b2033' : NEON[i % NEON.length], fg = i => tl[i].loss ? '#8f9bd0' : NEON_FG[i % NEON.length];
+        const tt = tl.reduce((a, w) => a + Math.max(0, C.num(w.weight)), 0) || 1;
+        const sim = s.tSim && s.tSim.cnt.length === tl.length ? s.tSim : null;
+        const winCnt = sim ? sim.cnt.reduce((a, c, i) => a + (tl[i].loss ? 0 : c), 0) : 0;
+        return {
+          tWheelBg: tl.length ? `repeating-conic-gradient(from 0deg, rgba(255,255,255,.9) 0deg .6deg, transparent .6deg ${ts}deg), conic-gradient(${tl.map((w, i) => `${col(i)} ${i * ts}deg ${(i + 1) * ts}deg`).join(',')})` : '#1b2033',
+          tWheelLabels: tl.map((w, i) => ({ label: w.label, angle: i * ts + ts / 2, fg: fg(i) })),
+          tSpin: () => this.testSpin(), tSimulate: () => this.testSimulate(), tSpinDisabled: s.tSpinning || tl.length < 2,
+          tSpinLabel: s.tSpinning ? 'Girando…' : 'Testar giro',
+          tHasResult: !!s.tResult && !s.tSpinning, tResultText: s.tResult ? (s.tResult.loss ? `Resultado: ${s.tResult.label}` : `Ganhou: ${s.tResult.label}!`) : '',
+          tResultBg: s.tResult && !s.tResult.loss ? 'oklch(0.8 0.15 150)' : '#2e3946', tResultFg: s.tResult && !s.tResult.loss ? '#0d1a10' : '#f2f5f7',
+          tHasSim: !!sim, tSimTitle: sim ? `Resultado de ${sim.n.toLocaleString('pt-BR')} giros · ${(winCnt / sim.n * 100).toFixed(1).replace('.', ',')}% com prêmio` : '',
+          tSimRows: sim ? tl.map((w, i) => ({ label: w.label, color: col(i) === '#1b2033' ? '#5a6390' : col(i), count: `${sim.cnt[i]}x`, real: `${(sim.cnt[i] / sim.n * 100).toFixed(1).replace('.', ',')}%`, cfg: `${(Math.max(0, C.num(w.weight)) / tt * 100).toFixed(1).replace('.', ',')}%`, w: (sim.cnt[i] / sim.n * 100).toFixed(1) })) : [],
+        };
+      })(),
+      wheelRef: this.wheelRef, toggleSound: () => { const v = !this.state.soundOn; try { localStorage.setItem('xc_sound', v ? '1' : '0'); } catch (e) {} this.setState({ soundOn: v }); if (v) this.sfx('tick'); },
+      soundLabel: s.soundOn ? '🔊 Som ligado' : '🔇 Som desligado',
+      wheelBulbs: Array.from({ length: 24 }, (_, i) => ({ angle: i * 15, delay: (i % 2) * 0.35, speed: s.spinning ? 0.35 : 1.4, color: ['oklch(0.8 0.2 330)', 'oklch(0.85 0.17 195)', 'oklch(0.88 0.16 90)'][i % 3] })),
+      showConfetti: !!s.wResult && !s.wResult.loss && !s.spinning,
+      confetti: Array.from({ length: 36 }, (_, i) => { const ang = (i / 36) * Math.PI * 2, r = 120 + (i * 37 % 90); return { dx: Math.round(Math.cos(ang) * r), dy: Math.round(Math.sin(ang) * r + 40), delay: (i % 6) * 0.03, color: NEON[i % NEON.length] }; }),
       myWins: s.myWins.map(g => ({ label: g.label, when: C.ago(g.at, now) })), hasMyWins: s.myWins.length > 0,
       winners, noWinners: winners.length === 0,
 
@@ -1605,8 +1764,12 @@ class Component extends DCLogic {
       randPN: () => { let r, g = 0; do { r = Math.floor(Math.random() * total); g++; } while (prizeSet.has(r) && g < 50); this.setState({ newPN: { ...s.newPN, number: pad(r) } }); },
       addPN: () => this.addPN(),
       pnRows: s.prizeNumbers.map(p => { const o = s.pnOwners[p.number]; return { number: pad(p.number), prize: p.prize, status: o ? `Saiu · ${o.name} · ${C.fmtPhone(o.phone)}` : 'Ainda não saiu', statusColor: o ? 'oklch(0.8 0.15 150)' : '#9aa6b2', onPrize: e => this.updPN(p, e.target.value), onRemove: () => this.rmPN(p) }; }),
-      wheelRows: wheel.map((w, i) => ({ label: w.label, weight: w.weight, loss: !!w.loss, swatch: segCol(i), prob: `${Math.round(Math.max(0, C.num(w.weight)) / wSum * 100)}%`, onLabel: e => updArr('wheel', i, { label: e.target.value }), onWeight: e => updArr('wheel', i, { weight: e.target.value.replace(/[^\d.,]/g, '') }), onLoss: e => updArr('wheel', i, { loss: e.target.checked }), onRemove: () => rmArr('wheel', i) })),
-      addWheel: () => this.setC({ wheel: [...wheel, { label: 'Novo prêmio', weight: '10', loss: false }] }),
+      wheelRows: wheel.map((w, i) => ({ label: w.label, weight: w.weight, loss: !!w.loss, swatch: segCol(i), prob: `${Math.round(Math.max(0, C.num(w.weight)) / wSum * 100)}%`, segLabel: `Casa ${i + 1}`, onLabel: e => updArr('wheel', i, { label: e.target.value }), onWeight: e => updArr('wheel', i, { weight: e.target.value.replace(/[^\d.,]/g, '') }), onLoss: e => updArr('wheel', i, { loss: e.target.checked }), onRemove: () => rmArr('wheel', i) })),
+      addWheel: () => { const left = Math.max(0, Math.round((100 - wTotal) * 100) / 100); this.setC({ wheel: [...wheel, { label: 'Novo prêmio', weight: String(left || 0).replace('.', ','), loss: false }] }); },
+      wTotalLabel: `${String(wTotal).replace('.', ',')}%`, wTotalOk: Math.abs(wTotal - 100) < 0.01,
+      wTotalColor: Math.abs(wTotal - 100) < 0.01 ? 'oklch(0.8 0.15 150)' : 'oklch(0.75 0.16 25)',
+      wTotalMsg: Math.abs(wTotal - 100) < 0.01 ? 'Tudo certo: as chances somam 100%.' : wTotal < 100 ? `Faltam ${String(Math.round((100 - wTotal) * 100) / 100).replace('.', ',')}% para fechar 100%.` : `Passou ${String(Math.round((wTotal - 100) * 100) / 100).replace('.', ',')}% de 100%. Diminua alguma chance.`,
+      wEqual: () => { if (!wheel.length) return; const base = Math.floor(10000 / wheel.length) / 100; const last = Math.round((100 - base * (wheel.length - 1)) * 100) / 100; this.setC({ wheel: wheel.map((w, i) => ({ ...w, weight: String(i === wheel.length - 1 ? last : base).replace('.', ',') })) }); },
       spinLog: s.aSpins.slice(0, 50).map(g => ({ name: g.name || C.fmtPhone(g.phone), label: g.label, when: C.ago(Date.parse(g.created_at), now), color: g.loss ? '#9aa6b2' : 'oklch(0.8 0.15 150)' })), noSpinLog: s.aSpins.length === 0,
       orderFilters: [['todos', `Todos (${aOrders.length})`], ['pendentes', `Pendentes (${pending.length})`], ['pagos', `Pagos (${paid.length})`], ['vencidos', `Vencidos (${aOrders.filter(isExp).length})`]].map(([k, label]) => ({ label, bg: s.orderF === k ? '#f2f5f7' : 'transparent', fg: s.orderF === k ? '#1e2630' : '#f2f5f7', onClick: () => this.setState({ orderF: k }) })),
       orderQ: s.orderQ, setOrderQ: e => this.setState({ orderQ: e.target.value }), orderRows, noOrders: aOrders.length === 0 || orderRows.length === 0,
