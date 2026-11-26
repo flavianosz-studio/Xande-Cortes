@@ -1,1 +1,7 @@
-{ "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
+{
+  "git": { "deploymentEnabled": true },
+  "ignoreCommand": "git log -1 --pretty=%B | grep -q '\\[skip ci\\]' && exit 0 || exit 1",
+  "rewrites": [
+    { "source": "/((?!fotos/|.*\\.).*)", "destination": "/index.html" }
+  ]
+}
